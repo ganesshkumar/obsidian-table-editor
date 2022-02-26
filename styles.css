@@ -1,18 +1,18 @@
 /* Sets all the text color to red! */
-button {
-    background-color: lightgrey;
+.mte > button {
+    background-color: lightgray;
 }
 
-.button-container {
-    margin: 10pt 5pt;
+.button-container.mte {
+    margin: 10pt 0;
 }
 
-.button-container > input {
+.button-container.mte > input {
     max-width: 100pt;
-    margin: 0pt 10pt;
+    margin: 5pt 10pt;
 }
 
-.grid {
+.grid.mte {
     display: grid;
     width: fit-content;
     margin-top: 5px;
@@ -20,21 +20,21 @@ button {
     border-top: 1px solid black;
 }
 
-.grid > .cell-container > .cell {
+.grid.mte > .cell-container.mte > .cell.mte {
     padding: 8px 4px;
 }
 
-.grid > .cell-container {
+.grid.mte > .cell-container.mte {
     display: flex;
     border-left: 1px solid black;
     border-bottom: 1px solid black;
 }
 
-.grid > .cell-container.header {
+.grid.mte > .cell-container.mte.header {
     background-color: lightgray;
 }
 
-.grid > .cell-container > .cell {
+.grid.mte > .cell-container.mte > .cell.mte {
     min-width: 100pt;
     max-width: 250pt;
     padding-left: 10pt;
@@ -42,21 +42,21 @@ button {
     width: 100%;
 }
 
-.relative {
+.relative.mte {
     position: relative;
 }
 
-.absolute {
+.mte > .absolute {
     cursor: pointer;
     position: absolute;
     right: 0;
     top: 25%;
 }
 
-.display-block {
+.mte > .display-block {
     display: block;
 }
 
-.display-none {
+.mte > .display-none {
     display: none;
 }

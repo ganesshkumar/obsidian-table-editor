@@ -1,5 +1,5 @@
 import * as React from "react";
-import { parseMarkdownTable, toMarkdown } from "../utils/markdown";
+import { parseCsvData, parseExcelData, parseMarkdownTable, sanitize, toMarkdown } from "../utils/markdown";
 import Cell from "./Cell";
 
 type Props = {
@@ -21,7 +21,9 @@ export const TableEditor = (props: Props) => {
   }
 
   React.useEffect(() => {
-    setValues(parseMarkdownTable(props.data) || Array(2).fill(['']))
+    let data = parseMarkdownTable(props.data) || parseCsvData(props.data) || parseExcelData(props.data) || Array(2).fill(['']);
+    data = sanitize(data);
+    setValues(data);
   }, [props.data]);
 
   React.useEffect(() => {
@@ -46,16 +48,17 @@ export const TableEditor = (props: Props) => {
 
   return (
     <>
-      <div className='button-container'>
+      <div className='mte button-container'>
         Rows : <input type='text' onChange={e => setNewRows(parseInt(e.target.value))} placeholder='3'/>
         Columns : <input type='text' onChange={e => setNewCols(parseInt(e.target.value))} placeholder='3' />
         <button onClick={newTableClicked}>New Table</button>
         <button onClick={clearClicked}>Clear Table</button>
       </div>
-      <div className='button-container'>
+      <div className='mte button-container'>
         <button onClick={copyClicked}>{copyText}</button>
+        {/* <svg viewBox="0 0 100 100" className="checkbox-glyph" width="18" height="18"><path fill="currentColor" stroke="currentColor" d="M89.9,20c-0.9,0-1.7,0.4-2.3,1l-51,51l-21-21c-0.8-0.9-2.1-1.2-3.2-0.9s-2.1,1.2-2.4,2.4c-0.3,1.2,0,2.4,0.9,3.2L34.3,79 c1.3,1.3,3.4,1.3,4.7,0l53.3-53.3c1-1,1.3-2.4,0.7-3.7C92.6,20.7,91.3,19.9,89.9,20z"></path></svg> */}
       </div>
-      <div className="grid" style={{
+      <div className="mte grid" style={{
         gridTemplateColumns: `repeat(${values[0]?.length}, 1fr)`
       }}>
         {
@@ -65,7 +68,7 @@ export const TableEditor = (props: Props) => {
           .flat()
         }
       </div>
-      <div className='button-container'>
+      <div className='mte button-container'>
         <button onClick={copyClicked}>{copyText}</button>
       </div>
     </>

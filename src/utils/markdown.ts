@@ -1,10 +1,9 @@
-export function parseMarkdownTable(data: string): any[][] {
+export function parseMarkdownTable(data: string): any[][] | undefined {
   if (data) {
     data = data.trim();
 
     const lines = data.split('\n');
     if (lines.length < 2) {
-      // handle error
       return;
     }
 
@@ -38,11 +37,39 @@ export function parseMarkdownTable(data: string): any[][] {
     return result
   }
 
-  return [];
+  return undefined;
 }
 
+export function parseCsvData(data: string): any[][] | undefined {
+  const csvData = data.split('\n').map(
+    line => line.split(',').map(value => value.trim()));
 
-export const toMarkdown = (values: any[][]) => {
+  if (csvData && csvData[0]?.length && csvData[0].length > 1) {
+    return csvData;
+  }
+  return undefined;
+}
+
+export function parseExcelData(data: string): any[][] {
+  console.log(data)
+  const excelData = (data as any).replaceAll('\t', ',');
+  console.log(excelData)
+  return parseCsvData(excelData);
+}
+
+export function sanitize(data: string[][]) {
+  const maxCol = data.map(r => r.length).reduce((a, v) => a > v ? a : v, -1);
+  return data.map(row => {
+    const diff = maxCol - row.length;
+    if (diff > 0) {
+      return row.concat(Array(diff).fill(''));
+    } else {
+      return row
+    }
+  });
+}
+
+export const toMarkdown = (values: any[][]): string => {
   const cols = values[0]?.length;
   let maxColWidth = Array(cols).fill(-1);
   

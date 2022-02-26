@@ -22,7 +22,6 @@ export class TableView extends ItemView {
   }
 
   async setState(state: any, result: ViewStateResult): Promise<void> {
-    console.log('setstate')  
     if ('data' in state) {
       this.state = state;
       ReactDOM.render(
