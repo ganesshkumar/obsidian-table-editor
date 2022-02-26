@@ -17,7 +17,6 @@ export const TableEditor = (props: Props) => {
   const onContentChanged = (rowIndex: number, colIndex: number, value: string) => {
     const newValues = [...values];
     newValues[rowIndex][colIndex] = value;
-    props.updateViewData(toMarkdown(newValues));
     setValues(newValues);
   }
 
@@ -32,20 +31,23 @@ export const TableEditor = (props: Props) => {
     if (copyText !== 'Copy as Markdown') {
       setCopyText('Copy as Markdown');
     }
-  }, [values]);
+    props.updateViewData(toMarkdown(values, colJustify));
+  }, [values, colJustify]);
 
   const copyClicked = () => {
     setCopyText('Copied!');
-    navigator?.clipboard?.writeText(toMarkdown(values));
+    navigator?.clipboard?.writeText(toMarkdown(values, colJustify));
   }
 
   const newTableClicked = () => {
     const newValues = Array(newRows).fill([]).map(_ => Array(newCols).fill(''));
     setValues(newValues);
+    setColJustify(Array(newValues[0].length).fill('LEFT'))
   }
 
   const clearClicked = () => {
     setValues(Array(2).fill(['']));
+    setColJustify(Array(1).fill('LEFT'));
   }
 
   return (
