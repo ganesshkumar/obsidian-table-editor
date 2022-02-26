@@ -2,6 +2,27 @@
 
 An Obsidian plugin to provide an editor for Markdown tables. It can open CSV data and data from Microsoft Excel, Google Sheets, Apple Numbers and LibreOffice Calc as Markdown tables from Obsidian Markdown editor.
 
+![Obsidian Table Editor](https://user-images.githubusercontent.com/2135089/155855554-28f69b38-1f1c-4287-b2da-ba0b75ecc1e1.png)
+
+[![Tag 0.1.0](https://img.shields.io/badge/tag-0.1.0-blue)](https://github.com/ganesshkumar/obsidian-table-editor) 
+[![MIT License](https://img.shields.io/github/license/ganesshkumar/obsidian-table-editor)](LICENSE)
+
+## Table of Contents
+
+- [Obsidian Table Editor](#obsidian-table-editor)
+  * [1. Usage Guide](#1-usage-guide)
+    + [1.1 Create a New Table](#11-create-a-new-table)
+    + [1.2 Edit and format an existing Markdown Table](#12-edit-and-format-an-existing-markdown-table)
+    + [1.3 CVS data to Markdown Table](#13-cvs-data-to-markdown-table)
+    + [1.4 Excel or Sheets to Markdown Table](#14-excel-or-sheets-to-markdown-table)
+      - [1.5 Operations](#15-operations)
+        * [Cell Operations](#cell-operations)
+        * [Header Operations](#header-operations)
+  * [2. Installation](#2-installation)
+    + [2.1 From GitHub](#21-from-github)
+  * [3. License](#3-license)
+  * [4. Other Obsidian plusins/tools made by me](#4-other-obsidian-plusins-tools-made-by-me)
+
 ## 1. Usage Guide
 
 ### 1.1 Create a New Table
@@ -25,7 +46,7 @@ An Obsidian plugin to provide an editor for Markdown tables. It can open CSV dat
 
 ![CVS data to Markdown Table](https://user-images.githubusercontent.com/2135089/155854610-992bfa4f-1be3-4a56-ab56-89726a7db253.gif)
 
-### 1.4 Excel/Sheets to Markdown Table
+### 1.4 Excel or Sheets to Markdown Table
 
 1. Select the Excel data (pasted via Ctrl/Cmd + Shift + V)
 2. Open *Markdown Table Editor*
