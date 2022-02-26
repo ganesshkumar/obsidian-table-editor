@@ -11,6 +11,7 @@ export const TableEditor = (props: Props) => {
   const [newRows, setNewRows] = React.useState(3);
   const [newCols, setNewCols] = React.useState(3);
   const [values, setValues] = React.useState(Array(2).fill(['']));
+  const [colJustify, setColJustify] = React.useState([])
   const [copyText, setCopyText] = React.useState('Copy as Markdown');
 
   const onContentChanged = (rowIndex: number, colIndex: number, value: string) => {
@@ -24,6 +25,7 @@ export const TableEditor = (props: Props) => {
     let data = parseMarkdownTable(props.data) || parseCsvData(props.data) || parseExcelData(props.data) || Array(2).fill(['']);
     data = sanitize(data);
     setValues(data);
+    setColJustify(Array(data[0].length).fill('LEFT'))
   }, [props.data]);
 
   React.useEffect(() => {
@@ -38,7 +40,7 @@ export const TableEditor = (props: Props) => {
   }
 
   const newTableClicked = () => {
-    const newValues = Array(newRows).fill([]).map(row => Array(newCols).fill(''));
+    const newValues = Array(newRows).fill([]).map(_ => Array(newCols).fill(''));
     setValues(newValues);
   }
 
@@ -64,7 +66,7 @@ export const TableEditor = (props: Props) => {
         {
           values.map((row, rowIdx) => 
             row.map((value: string, colIdx: number) => 
-              <Cell key={`${rowIdx}-${colIdx}`} content={value} row={rowIdx} col={colIdx} values={values} setValues={setValues} onContentChanged={onContentChanged} />))
+              <Cell key={`${rowIdx}-${colIdx}`} content={value} row={rowIdx} col={colIdx} values={values} setValues={setValues} colJustify={colJustify} setColJustify={setColJustify} onContentChanged={onContentChanged} />))
           .flat()
         }
       </div>

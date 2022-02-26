@@ -51,9 +51,7 @@ export function parseCsvData(data: string): any[][] | undefined {
 }
 
 export function parseExcelData(data: string): any[][] {
-  console.log(data)
   const excelData = (data as any).replaceAll('\t', ',');
-  console.log(excelData)
   return parseCsvData(excelData);
 }
 
