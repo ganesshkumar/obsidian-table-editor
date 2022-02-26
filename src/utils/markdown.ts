@@ -68,7 +68,6 @@ export function sanitize(data: string[][]) {
 }
 
 export const toMarkdown = (values: any[][], colJustify: string[]): string => {
-  console.log('to markdown', values, colJustify)
   const cols = values[0]?.length;
   let maxColWidth = Array(cols).fill(0);
   
@@ -99,8 +98,6 @@ export const toMarkdown = (values: any[][], colJustify: string[]): string => {
         return part;
       }
 
-      console.log(part, colJustify[idx])
-
       if (colJustify[idx] === 'LEFT') {
         return `:${part.split('').splice(1).join('')}`;
       } else if (colJustify[idx] === 'RIGHT') {
@@ -111,8 +108,6 @@ export const toMarkdown = (values: any[][], colJustify: string[]): string => {
     })
     .join('|');
   alignMarker = `|${alignMarker}`;
-
-  console.log(alignMarker)
 
   const rows = values.slice(1)
                 .map(row => lineformatter(row))

@@ -105,7 +105,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
           .setIcon("double-up-arrow-glyph")
           .onClick(() => {
             let newValues = [...values];
-            const isAllNumeric = newValues.map(row => Number.isFinite(Number.parseFloat(row[col]))).every(r => r === true);
+            const isAllNumeric = newValues.map((row, idx) => idx === 0 || Number.isFinite(Number.parseFloat(row[col]))).every(r => r === true);
             if (!isAllNumeric) {
               return
             }
@@ -122,7 +122,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
         .setIcon("double-down-arrow-glyph")
         .onClick(() => {
           let newValues = [...values];
-          const isAllNumeric = newValues.map(row => Number.isFinite(Number.parseFloat(row[col]))).every(r => r === true);
+          const isAllNumeric = newValues.map((row, idx) => idx === 0 || Number.isFinite(Number.parseFloat(row[col]))).every(r => r === true);
           if (!isAllNumeric) {
             return
           }
