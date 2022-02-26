@@ -51,9 +51,7 @@ export function parseCsvData(data: string): any[][] | undefined {
 }
 
 export function parseExcelData(data: string): any[][] {
-  console.log(data)
   const excelData = (data as any).replaceAll('\t', ',');
-  console.log(excelData)
   return parseCsvData(excelData);
 }
 
@@ -69,9 +67,9 @@ export function sanitize(data: string[][]) {
   });
 }
 
-export const toMarkdown = (values: any[][]): string => {
+export const toMarkdown = (values: any[][], colJustify: string[]): string => {
   const cols = values[0]?.length;
-  let maxColWidth = Array(cols).fill(-1);
+  let maxColWidth = Array(cols).fill(0);
   
   // Find column width for result
   for (let rowIdx = 0; rowIdx < values.length; rowIdx++) {
@@ -82,18 +80,37 @@ export const toMarkdown = (values: any[][]): string => {
   }
 
   // line formatter function
-  const lineformatter = (row: string[], pad: string) => `| ${row.map((h, idx) => {
-    const suffix = Array(maxColWidth[idx] - (h?.length || 0)).fill(pad).join('');
+  const lineformatter = (row: string[]) => `| ${row.map((h, idx) => {
+    const length = maxColWidth[idx] - (h?.length || 0);
+    const suffix = Array(length >= 0 ? length : 1).fill(' ').join('');
     return Number.isFinite(parseFloat(h)) ? `${suffix}${h}` : `${h}${suffix}`;
   }).join(' | ')} |`;
 
   // Headers
-  const header = lineformatter(values[0], ' ')
+  const header = lineformatter(values[0])
 
   // Align markers
-  const alignMarker = (lineformatter(Array(cols).fill('-'), '-') as any).replaceAll(' ', '-')
+  let alignMarker = (lineformatter(Array(cols).fill('-')) as any).replaceAll(' ', '-')
+  alignMarker = alignMarker.split('|')
+    .splice(1).splice(0, alignMarker.length - 2)
+    .map((part: string, idx: number) => {
+      if (!part || part.length < 0) {
+        return part;
+      }
+
+      if (colJustify[idx] === 'LEFT') {
+        return `:${part.split('').splice(1).join('')}`;
+      } else if (colJustify[idx] === 'RIGHT') {
+        return `${part.split('').splice(0, part.length - 1).join('')}:`;
+      } else {
+        return `:${part.split('').splice(1).splice(0, part.length - 2).join('')}:`;
+      }
+    })
+    .join('|');
+  alignMarker = `|${alignMarker}`;
+
   const rows = values.slice(1)
-                .map(row => lineformatter(row, ' '))
+                .map(row => lineformatter(row))
                 .join('\n');
 
   return `${header}\n${alignMarker}\n${rows}\n`;

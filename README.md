@@ -1,72 +1,119 @@
-## Obsidian Sample Plugin
+# Obsidian Table Editor
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+An Obsidian plugin to provide an editor for Markdown tables. It can open CSV, Microsoft Excel/Google Sheets data as Markdown tables from Obsidian Markdown editor.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+![Obsidian Table Editor](https://user-images.githubusercontent.com/2135089/155855554-28f69b38-1f1c-4287-b2da-ba0b75ecc1e1.png)
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+[![Tag 0.1.0](https://img.shields.io/badge/tag-0.1.0-blue)](https://github.com/ganesshkumar/obsidian-table-editor) 
+[![MIT License](https://img.shields.io/github/license/ganesshkumar/obsidian-table-editor)](LICENSE)
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Changes the default font color to red using `styles.css`.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+## Table of Contents
 
-### First time developing plugins?
+- [Obsidian Table Editor](#obsidian-table-editor)
+  * [1. Usage Guide](#1-usage-guide)
+    + [1.1 Create a New Table](#11-create-a-new-table)
+    + [1.2 Edit and format an existing Markdown Table](#12-edit-and-format-an-existing-markdown-table)
+    + [1.3 CVS data to Markdown Table](#13-cvs-data-to-markdown-table)
+    + [1.4 Excel or Sheets to Markdown Table](#14-excel-or-sheets-to-markdown-table)
+      - [1.5 Operations](#15-operations)
+        * [Cell Operations](#cell-operations)
+        * [Header Operations](#header-operations)
+  * [2. Installation](#2-installation)
+    + [2.1 From GitHub](#21-from-github)
+  * [3. License](#3-license)
+  * [4. Other Obsidian plusins/tools made by me](#4-other-obsidian-plusins-tools-made-by-me)
 
-Quick starting guide for new plugin devs:
+## 1. Usage Guide
 
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+### 1.1 Create a New Table
 
-### Releasing new releases
+1. Click `Open Markdown Table Editor` button from the *ribbon*.
+2. Use `Markdown Table Editor: Open Editor` command from the *command palette*.
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+![Create a New Table](https://user-images.githubusercontent.com/2135089/155854358-fe7df44f-a9ad-42f4-b7e4-e8b639b4c7f8.gif)
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+### 1.2 Edit and format an existing Markdown Table
 
-### Adding your plugin to the community plugin list
+1. Select the markdown content
+2. Open *Markdown Table Editor*
 
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+![Edit and format an existing Markdown Table](https://user-images.githubusercontent.com/2135089/155854503-9c894dff-fea2-4785-8078-78b53b23f98c.gif)
 
-### How to use
+### 1.3 CVS data to Markdown Table
 
-- Clone this repo.
-- `npm i` or `yarn` to install dependencies
-- `npm run dev` to start compilation in watch mode.
+1. Select the CSV content
+2. Open *Markdown Table Editor*
 
-### Manually installing the plugin
+![CVS data to Markdown Table](https://user-images.githubusercontent.com/2135089/155854610-992bfa4f-1be3-4a56-ab56-89726a7db253.gif)
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+### 1.4 Excel or Sheets to Markdown Table
 
-### Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
+1. Select the Excel data (pasted via Ctrl/Cmd + Shift + V)
+2. Open *Markdown Table Editor*
+
+![Excel Sheets to Markdown Table](https://user-images.githubusercontent.com/2135089/155854780-36860953-cd41-41cb-ba8f-83de7e94f04c.gif)
+
+#### 1.5 Operations
+
+The following operations are supported
+
+##### Cell Operations
+
+- Row
+	- Add row above
+	- Add row below
+	- Delete row
+	- Move row up
+	- Move row down
+- Column
+	* Add column above
+	- Add column below
+	- Delete column
+	- Move column up
+	- Move column down
 
 
-### API Documentation
+##### Header Operations
+- Justify
+	- Left
+	- Center
+	- Right
+- Sort
+	- Text
+		- Ascending
+		- Descending
+	- Numberic
+		- Ascending
+		- Descending
 
-See https://github.com/obsidianmd/obsidian-api
+![operations](https://user-images.githubusercontent.com/2135089/155855370-3a93ae56-95df-4c36-be7a-2fc338f275a6.gif)
+
+
+## 2. Installation
+
+### 2.1 From GitHub
+
+1. Download the Latest Release from the Releases section of the GitHub Repository
+2. Put files to your vault's plugins folder: `<vault>/.obsidian/plugins/obsidian-excel-to-markdown-table`  
+3. Reload Obsidian
+4. If prompted about Safe Mode, you can disable safe mode and enable the plugin.  
+    Otherwise, head to Settings, third-party plugins, make sure safe mode is off and enable the plugin from there.
+
+> Note: The `.obsidian` folder may be hidden. On macOS, you should be able to press `Command+Shift+Dot` to show the folder in Finder.
+
+## 3. License
+[MIT](LICENSE)
+
+## 4. Other Obsidian plusins/tools made by me
+
+| # | Name/Repo                                                                                            | Link                                                    | Type   |
+|---|------------------------------------------------------------------------------------------------------|---------------------------------------------------------|--------|
+| 1 | [Obsidian Excel to Markdown Table](https://github.com/ganesshkumar/obsidian-excel-to-markdown-table) |                                                         | Plugin | 
+| 2 | [Obsidian Clipper Maker](https://github.com/ganesshkumar/obsidian-bookmarklet-maker)                 | [Live Link](https://obsidian-clipper-maker.vercel.app/) | Tool   |
+| 3 | [Obsidian Plugin Stats](https://github.com/ganesshkumar/obsidian-plugins-stats-ui)                   | [Live Link](https://obsidian-plugin-stats.vercel.app/)  | Tool   |
+
+---
+
+If you like my work, you could consider buying me a coffee. It is unnecessary, but appreciated 🙂
+
+<a href="https://www.buymeacoffee.com/ganesshkumar" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>

@@ -8,7 +8,7 @@ export default class MyPlugin extends Plugin {
       (leaf) => new TableView(leaf)
     );
 
-    this.addRibbonIcon("pane-layout", "Open Markdown Table", () => {
+    this.addRibbonIcon("pane-layout", "Open Markdown Table Editor", () => {
       this.activateView();
     });
 
