@@ -1,4 +1,62 @@
 /* Sets all the text color to red! */
-body {
-    color: red;
+button {
+    background-color: lightgrey;
+}
+
+.button-container {
+    margin: 10pt 5pt;
+}
+
+.button-container > input {
+    max-width: 100pt;
+    margin: 0pt 10pt;
+}
+
+.grid {
+    display: grid;
+    width: fit-content;
+    margin-top: 5px;
+    border-right: 1px solid black;
+    border-top: 1px solid black;
+}
+
+.grid > .cell-container > .cell {
+    padding: 8px 4px;
+}
+
+.grid > .cell-container {
+    display: flex;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.grid > .cell-container.header {
+    background-color: lightgray;
+}
+
+.grid > .cell-container > .cell {
+    min-width: 100pt;
+    max-width: 250pt;
+    padding-left: 10pt;
+    padding-right: 20pt;
+    width: 100%;
+}
+
+.relative {
+    position: relative;
+}
+
+.absolute {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 25%;
+}
+
+.display-block {
+    display: block;
+}
+
+.display-none {
+    display: none;
 }

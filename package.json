@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.1",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "markdown-table-editor",
+	"version": "0.1.0",
+	"description": "Editor for Markdown table - for Obsidian (https://obsidian.md)",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
@@ -13,12 +13,21 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^16.11.6",
+		"@types/react": "^17.0.39",
+		"@types/react-dom": "^17.0.11",
 		"@typescript-eslint/eslint-plugin": "^5.2.0",
 		"@typescript-eslint/parser": "^5.2.0",
 		"builtin-modules": "^3.2.0",
 		"esbuild": "0.13.12",
+		"esbuild-plugin-less": "^1.1.6",
 		"obsidian": "^0.12.17",
 		"tslib": "2.3.1",
 		"typescript": "4.4.4"
+	},
+	"dependencies": {
+		"@arnog/esbuild-plugin-less": "^1.1.0",
+		"react": "^17.0.2",
+		"react-contenteditable": "^3.3.6",
+		"react-dom": "^17.0.2"
 	}
 }
