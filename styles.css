@@ -1,7 +1,8 @@
-/* Sets all the text color to red! */
-.mte > button {
+
+/* Disabling the color as it makes the text non-readable in dark theme */
+/* .mte > button {
     background-color: lightgray;
-}
+} */
 
 .button-container.mte {
     margin: 10pt 0;
@@ -30,9 +31,11 @@
     border-bottom: 1px solid black;
 }
 
+/* Disabling the color as it makes the text non-readable in dark theme */
+/*
 .grid.mte > .cell-container.mte.header {
     background-color: lightgray;
-}
+} */
 
 .grid.mte > .cell-container.mte > .cell.mte {
     min-width: 100pt;
