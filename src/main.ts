@@ -1,7 +1,7 @@
 import { Editor, MarkdownView, Plugin } from 'obsidian';
 import { TableView, MARKDOWN_TABLE_EDITOR_VIEW } from "./view";
 
-export default class MyPlugin extends Plugin {
+export default class MarkdownTableEditorPlugin extends Plugin {
 	async onload() {
 		this.registerView(
       MARKDOWN_TABLE_EDITOR_VIEW,
