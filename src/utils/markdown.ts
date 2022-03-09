@@ -1,3 +1,10 @@
+import * as Papa from 'papaparse';
+
+/* Not using this function as of now
+ * Will be needed if we have to add an exception to parsing logic when [[link|alias]] is used,
+ * and where we need to supress spliting at the pipe between the link and alias.
+ * keeping it for now, will delete it later in case if this is not needed for a while!
+ */
 export function parseMarkdownTable(data: string): any[][] | undefined {
   if (data) {
     data = data.trim();
@@ -40,19 +47,50 @@ export function parseMarkdownTable(data: string): any[][] | undefined {
   return undefined;
 }
 
-export function parseCsvData(data: string): any[][] | undefined {
-  const csvData = data.split('\n').map(
-    line => line.split(',').map(value => value.trim()));
+export function parseInputData(input: string): any[][] | undefined {
+  let {data, meta} = Papa.parse(input.trim());
 
-  if (csvData && csvData[0]?.length && csvData[0].length > 1) {
-    return csvData;
+  if (data && data[0]?.length && data[0].length > 1) {
+    if (meta.delimiter === '|') {
+      // Markdown table
+      // Remove the second row that represents the alignment
+      if (data.length > 1) {
+        data.splice(1, 1);
+      }
+
+      // Remove the first and last column that are empty when we parsed the data
+      data = data.map((row: string[]) => {
+        row.splice(row.length - 1, 1);
+        row.splice(0, 1);
+        return row;
+      });
+
+      // Handing [[link|alias]] in a cell
+      data = data.map((row: string[]) => {
+        let writeIndex = 0;
+        const result: string[] = [];
+        for (let index = 0; index < row.length; index++) {
+          if (index === row.length - 1) {
+            result.push(row[index]);
+            continue;
+          }
+
+          if (row[index].includes('[[') && row[index].endsWith('\\') && row[index + 1].includes(']]')) {
+            result[writeIndex] = `${row[index]}|${row[index + 1]}`;
+            writeIndex++;
+            index++;
+          } else {
+            result[writeIndex] = row[index];
+            writeIndex++;
+          }
+        }
+        return result;
+      });
+    }
+
+    return data;
   }
   return undefined;
-}
-
-export function parseExcelData(data: string): any[][] {
-  const excelData = (data as any).replaceAll('\t', ',');
-  return parseCsvData(excelData);
 }
 
 export function sanitize(data: string[][]) {

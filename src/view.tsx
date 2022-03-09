@@ -26,7 +26,7 @@ export class TableView extends ItemView {
       this.state = state;
       ReactDOM.render(
         <AppContext.Provider value={this.app}>
-          <TableEditor data={state.data} updateViewData={(data: string) => this.state.data = data}/>
+          <TableEditor inputData={state.data} updateViewData={(data: string) => this.state.data = data} supressNotices={false} />
         </AppContext.Provider>,
         this.containerEl.children[1]
       );
@@ -41,7 +41,7 @@ export class TableView extends ItemView {
   async onOpen() {
     ReactDOM.render(
       <AppContext.Provider value={this.app}>
-        <TableEditor data='' updateViewData={(data: string) => this.state.data = data} />
+        <TableEditor inputData='' updateViewData={(data: string) => this.state.data = data} supressNotices={true} />
       </AppContext.Provider>,
       this.containerEl.children[1]
     );

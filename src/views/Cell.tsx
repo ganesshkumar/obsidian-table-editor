@@ -1,5 +1,5 @@
 import { useApp } from "context/hooks";
-import { Menu, Notice } from "obsidian";
+import { Menu, Notice, Point } from "obsidian";
 import * as React from "react";
 import ContentEditable from "react-contenteditable";
 
@@ -12,18 +12,36 @@ type CellProps = {
   colJustify: string[]
   setColJustify: (colJustify: string[]) => void
   onContentChanged: (row: number, col: number, content: string) => void
+  autoFocus?: boolean
 }
 
-const Cell = ({row, col, content, onContentChanged, values, setValues, colJustify, setColJustify}: CellProps) => {
-  const contentEditable = React.useRef();
+const Cell = ({row, col, content, onContentChanged, values, setValues, colJustify, setColJustify, autoFocus=false}: CellProps) => {
+  const contentEditable = React.useRef<HTMLSpanElement>();
+  const contextMenu = React.useRef<HTMLSpanElement>();
 
   const handleChange = (evt: any) => {
     onContentChanged(row, col, evt.target.value);
   };
 
+  const handleKeyDown = (evt: any) => {
+    if (evt.altKey && evt.code === 'KeyO') {
+      showContextMenu({
+        x: contextMenu.current.getBoundingClientRect().left,
+        y: contextMenu.current.getBoundingClientRect().top
+      });
+    }
+  }
+
   const app = useApp();
   const [isHovering, setIsHovering] = React.useState(false);
   const [isFocused, setIsFocused] = React.useState(false);
+
+  React.useEffect(() => {
+    if (autoFocus) {
+      contentEditable.current.setText('');
+      contentEditable.current.focus();
+    }
+  }, [autoFocus]);
 
   const showContextMenu = (event: any) => {
     const menu = new Menu(app);
@@ -41,7 +59,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Left align")
-          .setIcon("left-arrow")
+          .setIcon("alignLeft")
           .onClick(() => {
             const newColJustify = [...colJustify];
             newColJustify[col] = 'LEFT';
@@ -52,7 +70,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Center align")
-          .setIcon("lines-of-text")
+          .setIcon("alignCenter")
           .onClick(() => {
             const newColJustify = [...colJustify];
             newColJustify[col] = 'CENTER';
@@ -63,7 +81,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Right align")
-          .setIcon("right-arrow")
+          .setIcon("alignRight")
           .onClick(() => {
             const newColJustify = [...colJustify];
             newColJustify[col] = 'RIGHT';
@@ -76,7 +94,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Sort text ascending")
-          .setIcon("double-up-arrow-glyph")
+          .setIcon("sortAsc")
           .onClick(() => {
             let newValues = [...values];
             const firstRow = newValues.shift();
@@ -89,7 +107,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Sort text descending")
-          .setIcon("double-down-arrow-glyph")
+          .setIcon("sortDesc")
           .onClick(() => {
             let newValues = [...values];
             const firstRow = newValues.shift();
@@ -102,7 +120,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Sort numeric ascending")
-          .setIcon("double-up-arrow-glyph")
+          .setIcon("sortAscNumeric")
           .onClick(() => {
             let newValues = [...values];
             const isAllNumeric = newValues.map((row, idx) => idx === 0 || Number.isFinite(Number.parseFloat(row[col]))).every(r => r === true);
@@ -119,7 +137,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
       item
         .setTitle("Sort numeric descending")
-        .setIcon("double-down-arrow-glyph")
+        .setIcon("sortDescNumeric")
         .onClick(() => {
           let newValues = [...values];
           const isAllNumeric = newValues.map((row, idx) => idx === 0 || Number.isFinite(Number.parseFloat(row[col]))).every(r => r === true);
@@ -139,7 +157,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Add row above")
-        .setIcon("up-chevron-glyph")
+        .setIcon("insertRow")
         .onClick(() => {
           const colLen = values[0].length;
           const newValues = [...values];
@@ -151,7 +169,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Add row below")
-        .setIcon("down-chevron-glyph")
+        .setIcon("insertRow")
         .onClick(() => {
           const colLen = values[0].length;
           const newValues = [...values];
@@ -163,7 +181,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Remove row")
-        .setIcon("cross")
+        .setIcon("deleteRow")
         .onClick(() => {
           const newValues = [...values];
           newValues.splice(row, 1);
@@ -176,7 +194,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Add column left")
-        .setIcon("left-chevron-glyph")
+        .setIcon("insertColumn")
         .onClick(() => {
           const newValues = [...values];
           newValues.forEach(row => row.splice(col, 0, ''));
@@ -192,7 +210,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Add column right")
-        .setIcon("right-chevron-glyph")
+        .setIcon("insertColumn")
         .onClick(() => {
           const newValues = [...values];
           newValues.forEach(row => row.splice(col + 1, 0, ''));
@@ -208,7 +226,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Remove column")
-        .setIcon("cross")
+        .setIcon("deleteColumn")
         .onClick(() => {
           const newValues = [...values];
           newValues.forEach(row => row.splice(col, 1));
@@ -226,7 +244,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Move row up")
-        .setIcon("up-arrow-with-tail")
+        .setIcon("moveRowUp")
         .onClick(() => {
           if (row === 0) {
             new Notice('Can not move this row up!');
@@ -241,7 +259,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
     item
       .setTitle("Move row down")
-      .setIcon("down-arrow-with-tail")
+      .setIcon("moveRowDown")
       .onClick(() => {
         if (row === values.length - 1) {
           new Notice('Can not move this row down!');
@@ -256,7 +274,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
     item
       .setTitle("Move column right")
-      .setIcon("right-arrow-with-tail")
+      .setIcon("moveColumnRight")
       .onClick(() => {
         if (col === values[0].length - 1) {
           new Notice('Can not move this column right!');
@@ -271,7 +289,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
     item
       .setTitle("Move column left")
-      .setIcon("left-arrow-with-tail")
+      .setIcon("moveColumnLeft")
       .onClick(() => {
         if (col === 0) {
           new Notice('Can not move this column left!');
@@ -283,7 +301,11 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       })
     );
 
-    menu.showAtMouseEvent(event);
+    if (event?.constructor.name === 'SyntheticBaseEvent') {
+      menu.showAtMouseEvent(event);
+    } else {
+      menu.showAtPosition(event as Point);
+    }
   }
 
   return (
@@ -297,11 +319,12 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
           onFocus={_ => setIsFocused(true)}
           onBlur={_ => setIsFocused(false)}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           tagName='span' />
-      <span onClick={e => showContextMenu(e)}
+        <span onClick={e => showContextMenu(e)} ref={contextMenu}
           className={`absolute ${isHovering || isFocused ? 'display-block' : 'display-none'}`}>
-        <svg viewBox="0 0 100 100" className="vertical-three-dots" width="18" height="18"><path fill="currentColor" stroke="currentColor" d="M50,6c-6.6,0-12,5.4-12,12s5.4,12,12,12s12-5.4,12-12S56.6,6,50,6z M50,10c4.4,0,8,3.6,8,8s-3.6,8-8,8s-8-3.6-8-8 S45.6,10,50,10z M50,38c-6.6,0-12,5.4-12,12s5.4,12,12,12s12-5.4,12-12S56.6,38,50,38z M50,42c4.4,0,8,3.6,8,8s-3.6,8-8,8 s-8-3.6-8-8S45.6,42,50,42z M50,70c-6.6,0-12,5.4-12,12c0,6.6,5.4,12,12,12s12-5.4,12-12C62,75.4,56.6,70,50,70z M50,74 c4.4,0,8,3.6,8,8c0,4.4-3.6,8-8,8s-8-3.6-8-8C42,77.6,45.6,74,50,74z"></path></svg>
-      </span>
+          <svg viewBox="0 0 100 100" className="vertical-three-dots" width="18" height="18"><path fill="currentColor" stroke="currentColor" d="M50,6c-6.6,0-12,5.4-12,12s5.4,12,12,12s12-5.4,12-12S56.6,6,50,6z M50,10c4.4,0,8,3.6,8,8s-3.6,8-8,8s-8-3.6-8-8 S45.6,10,50,10z M50,38c-6.6,0-12,5.4-12,12s5.4,12,12,12s12-5.4,12-12S56.6,38,50,38z M50,42c4.4,0,8,3.6,8,8s-3.6,8-8,8 s-8-3.6-8-8S45.6,42,50,42z M50,70c-6.6,0-12,5.4-12,12c0,6.6,5.4,12,12,12s12-5.4,12-12C62,75.4,56.6,70,50,70z M50,74 c4.4,0,8,3.6,8,8c0,4.4-3.6,8-8,8s-8-3.6-8-8C42,77.6,45.6,74,50,74z"></path></svg>
+        </span>
     </div>
   ) 
 }
