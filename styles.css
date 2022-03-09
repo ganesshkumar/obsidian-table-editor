@@ -17,8 +17,8 @@
     display: grid;
     width: fit-content;
     margin-top: 5px;
-    border-right: 1px solid black;
-    border-top: 1px solid black;
+    border-right: 1px solid;
+    border-top: 1px solid;
 }
 
 .grid.mte > .cell-container.mte > .cell.mte {
@@ -27,8 +27,8 @@
 
 .grid.mte > .cell-container.mte {
     display: flex;
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
+    border-left: 1px solid;
+    border-bottom: 1px solid;
 }
 
 /* Disabling the color as it makes the text non-readable in dark theme */
