@@ -1,5 +1,5 @@
 import { useApp } from "context/hooks";
-import { Menu, Notice } from "obsidian";
+import { Menu, Notice, Point } from "obsidian";
 import * as React from "react";
 import ContentEditable from "react-contenteditable";
 
@@ -17,10 +17,20 @@ type CellProps = {
 
 const Cell = ({row, col, content, onContentChanged, values, setValues, colJustify, setColJustify, autoFocus=false}: CellProps) => {
   const contentEditable = React.useRef<HTMLSpanElement>();
+  const contextMenu = React.useRef<HTMLSpanElement>();
 
   const handleChange = (evt: any) => {
     onContentChanged(row, col, evt.target.value);
   };
+
+  const handleKeyDown = (evt: any) => {
+    if (evt.altKey && evt.code === 'KeyO') {
+      showContextMenu({
+        x: contextMenu.current.getBoundingClientRect().left,
+        y: contextMenu.current.getBoundingClientRect().top
+      });
+    }
+  }
 
   const app = useApp();
   const [isHovering, setIsHovering] = React.useState(false);
@@ -30,7 +40,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     if (autoFocus) {
       contentEditable.current.focus();
     }
-  }, []);
+  }, [autoFocus]);
 
   const showContextMenu = (event: any) => {
     const menu = new Menu(app);
@@ -290,7 +300,11 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       })
     );
 
-    menu.showAtMouseEvent(event);
+    if (event?.constructor.name === 'SyntheticBaseEvent') {
+      menu.showAtMouseEvent(event);
+    } else {
+      menu.showAtPosition(event as Point);
+    }
   }
 
   return (
@@ -304,8 +318,9 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
           onFocus={_ => setIsFocused(true)}
           onBlur={_ => setIsFocused(false)}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           tagName='span' />
-        <span onClick={e => showContextMenu(e)}
+        <span onClick={e => showContextMenu(e)} ref={contextMenu}
           className={`absolute ${isHovering || isFocused ? 'display-block' : 'display-none'}`}>
           <svg viewBox="0 0 100 100" className="vertical-three-dots" width="18" height="18"><path fill="currentColor" stroke="currentColor" d="M50,6c-6.6,0-12,5.4-12,12s5.4,12,12,12s12-5.4,12-12S56.6,6,50,6z M50,10c4.4,0,8,3.6,8,8s-3.6,8-8,8s-8-3.6-8-8 S45.6,10,50,10z M50,38c-6.6,0-12,5.4-12,12s5.4,12,12,12s12-5.4,12-12S56.6,38,50,38z M50,42c4.4,0,8,3.6,8,8s-3.6,8-8,8 s-8-3.6-8-8S45.6,42,50,42z M50,70c-6.6,0-12,5.4-12,12c0,6.6,5.4,12,12,12s12-5.4,12-12C62,75.4,56.6,70,50,70z M50,74 c4.4,0,8,3.6,8,8c0,4.4-3.6,8-8,8s-8-3.6-8-8C42,77.6,45.6,74,50,74z"></path></svg>
         </span>

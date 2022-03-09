@@ -50,15 +50,16 @@ export const TableEditor = (props: Props) => {
     setColJustify(Array(1).fill('LEFT'));
   }
 
-  const shouldAutoFocus = (rowIndex: number, colIndex: number, content: string) => {
+  const shouldAutoFocus = (rowIndex: number, colIndex: number, content: string[][]) => {
+    let shouldAutoFocus = false;
     if (colIndex === 0) {
-      if (rowIndex === 0 && !content) {
-        return true;
-      } else if (rowIndex === 1 && content) {
-        return true;
+      if (rowIndex === 0 && content[0][0] === '') {
+        shouldAutoFocus = true;
+      } else if (rowIndex === 1 && content[0][0] !== '') {
+        shouldAutoFocus = true;
       }
     }
-    return false;
+    return shouldAutoFocus;
   }
 
   return (
@@ -79,7 +80,7 @@ export const TableEditor = (props: Props) => {
         {
           values.map((row, rowIdx) => 
             row.map((value: string, colIdx: number) => 
-              <Cell key={`${rowIdx}-${colIdx}`} content={value} row={rowIdx} col={colIdx} values={values} setValues={setValues} colJustify={colJustify} setColJustify={setColJustify} onContentChanged={onContentChanged} autoFocus={shouldAutoFocus(rowIdx, colIdx, value)}/>))
+              <Cell key={`${rowIdx}-${colIdx}`} content={value} row={rowIdx} col={colIdx} values={values} setValues={setValues} colJustify={colJustify} setColJustify={setColJustify} onContentChanged={onContentChanged} autoFocus={shouldAutoFocus(rowIdx, colIdx, values)}/>))
           .flat()
         }
       </div>
