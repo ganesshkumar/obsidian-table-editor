@@ -50,8 +50,6 @@ export function parseMarkdownTable(data: string): any[][] | undefined {
 export function parseInputData(input: string): any[][] | undefined {
   let {data, meta} = Papa.parse(input.trim());
 
-  console.log('parseCsvData');
-  console.log(data);
   if (data && data[0]?.length && data[0].length > 1) {
     if (meta.delimiter === '|') {
       // Markdown table
@@ -90,8 +88,6 @@ export function parseInputData(input: string): any[][] | undefined {
       });
     }
 
-    console.log('parsed data')
-    console.log(data)
     return data;
   }
   return undefined;

@@ -135,7 +135,6 @@ export default class MarkdownTableEditorPlugin extends Plugin {
 
   selectTableContent (view: MarkdownView) {
     const {data, startCursor, endCursor} =  this.getData(view);
-    console.log(startCursor, endCursor);
     const parsedData = parseInputData(data);
     if (parseInputData) {
       view.editor.setSelection(startCursor, endCursor);
