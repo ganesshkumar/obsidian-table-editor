@@ -25,6 +25,8 @@ An Obsidian plugin to provide an editor for Markdown tables. It can open CSV, Mi
 
 ## 1. Usage Guide
 
+There is a [video walkthrough](https://www.youtube.com/watch?v=rZX_ZVPOgC8) of this plugin in Chinese made by @emisjerry. Thank you emisjerry! 
+
 ### 1.1 Create a New Table
 
 1. Click `Open Markdown Table Editor` button from the *ribbon*.
