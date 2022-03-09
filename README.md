@@ -25,7 +25,7 @@ An Obsidian plugin to provide an editor for Markdown tables. It can open CSV, Mi
 
 ## 1. Usage Guide
 
-@emisjerry has made a [video walkthrough](https://www.youtube.com/watch?v=rZX_ZVPOgC8) of this plugin in Chinese (with English subtitle). Thank you emisjerry! 
+[@emisjerry](https://github.com/emisjerry) has made a [video walkthrough](https://www.youtube.com/watch?v=rZX_ZVPOgC8) of this plugin in Chinese (with English subtitle). Thank you emisjerry! 
 
 ### 1.1 Create a New Table
 
@@ -36,30 +36,30 @@ An Obsidian plugin to provide an editor for Markdown tables. It can open CSV, Mi
 
 ### 1.2 Edit and format an existing Markdown Table
 
-1. Select the markdown content
+1. Select the markdown content or just place the cursor inside the table content
 2. Open *Markdown Table Editor*
 
 ![Edit and format an existing Markdown Table](https://user-images.githubusercontent.com/2135089/155854503-9c894dff-fea2-4785-8078-78b53b23f98c.gif)
 
 ### 1.3 CVS data to Markdown Table
 
-1. Select the CSV content
+1. Select the CSV content or just place the cursor inside the CSV content
 2. Open *Markdown Table Editor*
 
 ![CVS data to Markdown Table](https://user-images.githubusercontent.com/2135089/155854610-992bfa4f-1be3-4a56-ab56-89726a7db253.gif)
 
 ### 1.4 Excel or Sheets to Markdown Table
 
-1. Select the Excel data (pasted via Ctrl/Cmd + Shift + V)
+1. Select the Excel data (pasted via Ctrl/Cmd + Shift + V) or just place the cursor inside the Excel data
 2. Open *Markdown Table Editor*
 
 ![Excel Sheets to Markdown Table](https://user-images.githubusercontent.com/2135089/155854780-36860953-cd41-41cb-ba8f-83de7e94f04c.gif)
 
-#### 1.5 Operations
+### 1.5 Operations
 
 The following operations are supported
 
-##### Cell Operations
+#### Cell Operations
 
 - Row
 	- Add row above
@@ -75,7 +75,7 @@ The following operations are supported
 	- Move column down
 
 
-##### Header Operations
+#### Header Operations
 - Justify
 	- Left
 	- Center
@@ -89,6 +89,22 @@ The following operations are supported
 		- Descending
 
 ![operations](https://user-images.githubusercontent.com/2135089/155855370-3a93ae56-95df-4c36-be7a-2fc338f275a6.gif)
+
+#### 1.6 Selecting table
+
+1. Just place the cursor inside Markdown table or CSV or Excel data
+2. Invoke the command "Markdown Table Editor: Select surrounding Table Content" command from the command palette.
+
+![selecting table content](https://user-images.githubusercontent.com/2135089/157485799-312feae5-436a-4d1b-bf4b-4b275a0200b1.gif)
+
+
+#### 1.7 Opening the Table Editor below the active leaf
+
+1. You can right click the ribbon icon and select "Open Editor (Below the Active View)" to split the current view horizontally and open the Table Editor below.
+2. You can also do it from the command palette using the "Markdown Table Editor:  Open Editor (Below the Active View)" command.
+
+![horizontal spilit](https://user-images.githubusercontent.com/2135089/157485730-cc910b8c-f64f-4669-bb7b-7b862a584743.gif)
+
 
 
 ## 2. Installation
@@ -106,7 +122,10 @@ The following operations are supported
 ## 3. License
 [MIT](LICENSE)
 
-## 4. Other Obsidian plusins/tools made by me
+## 4. Acknowledgements
+1. Special thanks for [@FelipeRearden](https://github.com/FelipeRearden) for his valuable feedback and feature suggestions that has helped shaping up this plugin!
+
+## 5. Other Obsidian plusins/tools made by me
 
 | # | Name/Repo                                                                                            | Link                                                    | Type   |
 |---|------------------------------------------------------------------------------------------------------|---------------------------------------------------------|--------|
