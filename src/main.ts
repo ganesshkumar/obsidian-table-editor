@@ -98,6 +98,7 @@ export default class MarkdownTableEditorPlugin extends Plugin {
   }
 
   getData (view: MarkdownView) {
+    console.log('getData')
     let data = undefined;
     let startCursor = undefined;
     let endCursor = undefined;
@@ -107,6 +108,7 @@ export default class MarkdownTableEditorPlugin extends Plugin {
       data = view.editor.getSelection();
     } else {
       let { line } = view.editor.getCursor();
+      console.log('line',line)
       // If user has not selection anything, serach for empty lines above and below the cursor position and take them as data
       if (!!view.editor.getLine(line).trim()) {
         let lineAbove = Math.max(line - 1, 0);
@@ -114,6 +116,8 @@ export default class MarkdownTableEditorPlugin extends Plugin {
           while (lineAbove > 0 && !!view.editor.getLine(lineAbove - 1).trim()) {
             lineAbove--;
           }
+        } else {
+          lineAbove = line;
         }
         
         let lineBelow = Math.min(line + 1, view.editor.lineCount() - 1);
@@ -121,19 +125,24 @@ export default class MarkdownTableEditorPlugin extends Plugin {
           while (lineBelow + 1 < view.editor.lineCount() && !!view.editor.getLine(lineBelow + 1).trim()) {
             lineBelow++;
           }
+        } else {
+          lineBelow = line;
         }
 
         startCursor = { line: lineAbove, ch: 0 };
         endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
 
+        console.log(startCursor, endCursor);
         data = view.editor.getRange(startCursor, endCursor);
       }
     }
 
+    console.log(data, startCursor, endCursor);
     return {data, startCursor, endCursor};
   }
 
   selectTableContent (view: MarkdownView) {
+    console.log('selectTableContent')
     const {data, startCursor, endCursor} =  this.getData(view);
     const parsedData = parseInputData(data);
     if (parseInputData) {

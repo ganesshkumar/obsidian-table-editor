@@ -48,7 +48,7 @@ export function parseMarkdownTable(data: string): any[][] | undefined {
 }
 
 export function parseInputData(input: string): any[][] | undefined {
-  let {data, meta}: {data: string[][], meta: any} = Papa.parse(input.trim());
+  let {data, meta}: {data: string[][], meta: any} = Papa.parse((input || '').trim());
 
   if (data && data[0]?.length && data[0].length > 1) {
     if (meta.delimiter === '|') {
