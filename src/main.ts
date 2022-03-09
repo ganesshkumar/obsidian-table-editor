@@ -1,7 +1,7 @@
 import { Editor, MarkdownView, Menu, Plugin } from 'obsidian';
 import { TableView, MARKDOWN_TABLE_EDITOR_VIEW } from "./view";
 import { addIcons } from 'utils/icons';
-
+import { parseInputData } from './utils/markdown';
 const VERTICAL_EDITOR_TEXT = 'Open Editor (Next to the Active View)';
 const HORIZONTAL_EDITOR_TEXT = 'Open Editor (Below the Active View)';
 
@@ -60,6 +60,14 @@ export default class MarkdownTableEditorPlugin extends Plugin {
 				this.activateView('horizontal');
 			}
     });
+
+    this.addCommand({
+      id: 'markdown-table-editor-select-table-content',
+      name: 'Select surrounding Table Content',
+      editorCallback: async (_: Editor, view: MarkdownView) => {
+        this.selectTableContent(view);
+      }
+    })
 	}
 
 	onunload() {
@@ -74,7 +82,7 @@ export default class MarkdownTableEditorPlugin extends Plugin {
 			return;
 		}
 
-    let data = this.getData(view);
+    let data = this.getData(view)?.data;
   
     const activeLeaf = this.app.workspace.activeLeaf;
     
@@ -91,25 +99,46 @@ export default class MarkdownTableEditorPlugin extends Plugin {
 
   getData (view: MarkdownView) {
     let data = undefined;
+    let startCursor = undefined;
+    let endCursor = undefined;
+
     // If user has selected something. Take the selection
     if (view.editor.somethingSelected()) {
       data = view.editor.getSelection();
     } else {
       let { line } = view.editor.getCursor();
       // If user has not selection anything, serach for empty lines above and below the cursor position and take them as data
-      if (view.editor.getLine(line).trim() !== '') {
+      if (!!view.editor.getLine(line).trim()) {
         let lineAbove = Math.max(line - 1, 0);
-        while (view.editor.getLine(lineAbove).trim() !== '' && lineAbove > 0) {
-          lineAbove--;
+        if (!!view.editor.getLine(lineAbove).trim()) {
+          while (lineAbove > 0 && !!view.editor.getLine(lineAbove - 1).trim()) {
+            lineAbove--;
+          }
         }
+        
         let lineBelow = Math.min(line + 1, view.editor.lineCount() - 1);
-        while (view.editor.getLine(lineBelow).trim() !== '' && lineBelow < view.editor.lineCount() - 1) {
-          lineBelow++;
+        if (!!view.editor.getLine(lineBelow).trim()) {
+          while (lineBelow + 1 < view.editor.lineCount() && !!view.editor.getLine(lineBelow + 1).trim()) {
+            lineBelow++;
+          }
         }
-        data = view.editor.getRange({ line: lineAbove, ch: 0 }, { line: lineBelow, ch: view.editor.getLine(lineBelow).length });
+
+        startCursor = { line: lineAbove, ch: 0 };
+        endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
+
+        data = view.editor.getRange(startCursor, endCursor);
       }
     }
 
-    return data;
+    return {data, startCursor, endCursor};
+  }
+
+  selectTableContent (view: MarkdownView) {
+    const {data, startCursor, endCursor} =  this.getData(view);
+    console.log(startCursor, endCursor);
+    const parsedData = parseInputData(data);
+    if (parseInputData) {
+      view.editor.setSelection(startCursor, endCursor);
+    }
   }
 }

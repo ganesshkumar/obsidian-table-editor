@@ -1,6 +1,6 @@
 import { Notice } from "obsidian";
 import * as React from "react";
-import { parseCsvData, parseExcelData, parseMarkdownTable, sanitize, toMarkdown } from "../utils/markdown";
+import { parseInputData, sanitize, toMarkdown } from "../utils/markdown";
 import Cell from "./Cell";
 
 type Props = {
@@ -32,14 +32,16 @@ export const TableEditor = ({inputData, updateViewData, supressNotices = false}:
   }, [inputData]);
 
   React.useEffect(() => {
-    let data = parseMarkdownTable(inputData) || parseCsvData(inputData) || parseExcelData(inputData);
+    let data = parseInputData(inputData);
     if (!data) {
       if (!supressNotices) {
         new Notice("Selection is not a valid Markdown table or CSV or Excel data. Creating a new table!");
       }
       data = Array(2).fill(['']);
     }
+
     data = sanitize(data);
+
     setValues(data);
     setColJustify(Array(data[0].length).fill('LEFT'));
     computeAutoFocusRow(data);

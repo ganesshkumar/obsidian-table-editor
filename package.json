@@ -26,6 +26,7 @@
 	},
 	"dependencies": {
 		"@arnog/esbuild-plugin-less": "^1.1.0",
+		"papaparse": "^5.3.1",
 		"react": "^17.0.2",
 		"react-contenteditable": "^3.3.6",
 		"react-dom": "^17.0.2"
