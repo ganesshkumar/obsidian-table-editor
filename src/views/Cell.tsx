@@ -58,7 +58,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Left align")
-          .setIcon("left-arrow")
+          .setIcon("alignLeft")
           .onClick(() => {
             const newColJustify = [...colJustify];
             newColJustify[col] = 'LEFT';
@@ -69,7 +69,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Center align")
-          .setIcon("lines-of-text")
+          .setIcon("alignCenter")
           .onClick(() => {
             const newColJustify = [...colJustify];
             newColJustify[col] = 'CENTER';
@@ -80,7 +80,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Right align")
-          .setIcon("right-arrow")
+          .setIcon("alignRight")
           .onClick(() => {
             const newColJustify = [...colJustify];
             newColJustify[col] = 'RIGHT';
@@ -93,7 +93,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Sort text ascending")
-          .setIcon("double-up-arrow-glyph")
+          .setIcon("sortAsc")
           .onClick(() => {
             let newValues = [...values];
             const firstRow = newValues.shift();
@@ -106,7 +106,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Sort text descending")
-          .setIcon("double-down-arrow-glyph")
+          .setIcon("sortDesc")
           .onClick(() => {
             let newValues = [...values];
             const firstRow = newValues.shift();
@@ -119,7 +119,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
         item
           .setTitle("Sort numeric ascending")
-          .setIcon("double-up-arrow-glyph")
+          .setIcon("sortAscNumeric")
           .onClick(() => {
             let newValues = [...values];
             const isAllNumeric = newValues.map((row, idx) => idx === 0 || Number.isFinite(Number.parseFloat(row[col]))).every(r => r === true);
@@ -136,7 +136,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
       menu.addItem((item) =>
       item
         .setTitle("Sort numeric descending")
-        .setIcon("double-down-arrow-glyph")
+        .setIcon("sortDescNumeric")
         .onClick(() => {
           let newValues = [...values];
           const isAllNumeric = newValues.map((row, idx) => idx === 0 || Number.isFinite(Number.parseFloat(row[col]))).every(r => r === true);
@@ -156,7 +156,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Add row above")
-        .setIcon("up-chevron-glyph")
+        .setIcon("insertRow")
         .onClick(() => {
           const colLen = values[0].length;
           const newValues = [...values];
@@ -168,7 +168,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Add row below")
-        .setIcon("down-chevron-glyph")
+        .setIcon("insertRow")
         .onClick(() => {
           const colLen = values[0].length;
           const newValues = [...values];
@@ -180,7 +180,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Remove row")
-        .setIcon("cross")
+        .setIcon("deleteRow")
         .onClick(() => {
           const newValues = [...values];
           newValues.splice(row, 1);
@@ -193,7 +193,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Add column left")
-        .setIcon("left-chevron-glyph")
+        .setIcon("insertColumn")
         .onClick(() => {
           const newValues = [...values];
           newValues.forEach(row => row.splice(col, 0, ''));
@@ -209,7 +209,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Add column right")
-        .setIcon("right-chevron-glyph")
+        .setIcon("insertColumn")
         .onClick(() => {
           const newValues = [...values];
           newValues.forEach(row => row.splice(col + 1, 0, ''));
@@ -225,7 +225,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Remove column")
-        .setIcon("cross")
+        .setIcon("deleteColumn")
         .onClick(() => {
           const newValues = [...values];
           newValues.forEach(row => row.splice(col, 1));
@@ -243,7 +243,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
       item
         .setTitle("Move row up")
-        .setIcon("up-arrow-with-tail")
+        .setIcon("moveRowUp")
         .onClick(() => {
           if (row === 0) {
             new Notice('Can not move this row up!');
@@ -258,7 +258,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
     item
       .setTitle("Move row down")
-      .setIcon("down-arrow-with-tail")
+      .setIcon("moveRowDown")
       .onClick(() => {
         if (row === values.length - 1) {
           new Notice('Can not move this row down!');
@@ -273,7 +273,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
     item
       .setTitle("Move column right")
-      .setIcon("right-arrow-with-tail")
+      .setIcon("moveColumnRight")
       .onClick(() => {
         if (col === values[0].length - 1) {
           new Notice('Can not move this column right!');
@@ -288,7 +288,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
     menu.addItem((item) =>
     item
       .setTitle("Move column left")
-      .setIcon("left-arrow-with-tail")
+      .setIcon("moveColumnLeft")
       .onClick(() => {
         if (col === 0) {
           new Notice('Can not move this column left!');

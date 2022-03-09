@@ -1,17 +1,21 @@
 import { Editor, MarkdownView, Menu, Plugin } from 'obsidian';
 import { TableView, MARKDOWN_TABLE_EDITOR_VIEW } from "./view";
+import { addIcons } from 'utils/icons';
 
 const VERTICAL_EDITOR_TEXT = 'Open Editor (Next to the Active View)';
 const HORIZONTAL_EDITOR_TEXT = 'Open Editor (Below the Active View)';
 
 export default class MarkdownTableEditorPlugin extends Plugin {
 	async onload() {
+    // Add custom icons
+    addIcons();
+
 		this.registerView(
       MARKDOWN_TABLE_EDITOR_VIEW,
       (leaf) => new TableView(leaf)
     );
 
-    this.addRibbonIcon("pane-layout", "Open Markdown Table Editor", (event) => {
+    this.addRibbonIcon("spreadsheet", "Open Markdown Table Editor", (event) => {
       if (event.type == 'click') {
         this.activateView('vertical');
         event.preventDefault();
