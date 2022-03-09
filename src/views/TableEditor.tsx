@@ -98,7 +98,7 @@ export const TableEditor = ({inputData, updateViewData, supressNotices = false}:
         {
           values.map((row, rowIdx) => 
             row.map((value: string, colIdx: number) => 
-              <Cell key={`${rowIdx}-${colIdx}`} content={value} row={rowIdx} col={colIdx} values={values} setValues={setValues} colJustify={colJustify} setColJustify={setColJustify} onContentChanged={onContentChanged} autoFocus={shouldAutoFocus(rowIdx, colIdx, values)}/>))
+              <Cell key={`${rowIdx}-${colIdx}`} content={value} row={rowIdx} col={colIdx} values={values} setValues={setValues} colJustify={colJustify} setColJustify={setColJustify} onContentChanged={onContentChanged} autoFocus={shouldAutoFocus(rowIdx, colIdx)}/>))
           .flat()
         }
       </div>
