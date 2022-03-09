@@ -1,18 +1,21 @@
+import { Notice } from "obsidian";
 import * as React from "react";
 import { parseCsvData, parseExcelData, parseMarkdownTable, sanitize, toMarkdown } from "../utils/markdown";
 import Cell from "./Cell";
 
 type Props = {
-  data: string,
+  inputData: string,
   updateViewData: (data: string) => void
+  supressNotices: boolean
 }
 
-export const TableEditor = (props: Props) => {
+export const TableEditor = ({inputData, updateViewData, supressNotices = false}: Props) => {
   const [newRows, setNewRows] = React.useState(3);
   const [newCols, setNewCols] = React.useState(3);
   const [values, setValues] = React.useState(Array(2).fill(['']));
   const [colJustify, setColJustify] = React.useState([])
   const [copyText, setCopyText] = React.useState('Copy as Markdown');
+  const [autoFocusRow, setAutoFocusRow] = React.useState(0);
 
   const onContentChanged = (rowIndex: number, colIndex: number, value: string) => {
     const newValues = [...values];
@@ -20,19 +23,35 @@ export const TableEditor = (props: Props) => {
     setValues(newValues);
   }
 
+  const computeAutoFocusRow = React.useCallback((values: string[][]) => {
+    if (!values || !values.length || values.length === 0 || !values[0] || !values[0].length || values[0].length === 0 || !values[0][0]) {
+      setAutoFocusRow(0);
+    } else {
+      setAutoFocusRow(1);
+    }
+  }, [inputData]);
+
   React.useEffect(() => {
-    let data = parseMarkdownTable(props.data) || parseCsvData(props.data) || parseExcelData(props.data) || Array(2).fill(['']);
+    let data = parseMarkdownTable(inputData) || parseCsvData(inputData) || parseExcelData(inputData);
+    if (!data) {
+      if (!supressNotices) {
+        new Notice("Selection is not a valid Markdown table or CSV or Excel data. Creating a new table!");
+      }
+      data = Array(2).fill(['']);
+    }
     data = sanitize(data);
     setValues(data);
-    setColJustify(Array(data[0].length).fill('LEFT'))
-  }, [props.data]);
+    setColJustify(Array(data[0].length).fill('LEFT'));
+    computeAutoFocusRow(data);
+  }, [inputData]);
 
   React.useEffect(() => {
     if (copyText !== 'Copy as Markdown') {
       setCopyText('Copy as Markdown');
     }
-    props.updateViewData(toMarkdown(values, colJustify));
+    updateViewData(toMarkdown(values, colJustify));
   }, [values, colJustify]);
+
 
   const copyClicked = () => {
     setCopyText('Copied!');
@@ -50,16 +69,13 @@ export const TableEditor = (props: Props) => {
     setColJustify(Array(1).fill('LEFT'));
   }
 
-  const shouldAutoFocus = (rowIndex: number, colIndex: number, content: string[][]) => {
-    let shouldAutoFocus = false;
+  const shouldAutoFocus = (rowIndex: number, colIndex: number) => {
     if (colIndex === 0) {
-      if (rowIndex === 0 && content[0][0] === '') {
-        shouldAutoFocus = true;
-      } else if (rowIndex === 1 && content[0][0] !== '') {
-        shouldAutoFocus = true;
+      if (rowIndex === autoFocusRow) {
+        return true;
       }
     }
-    return shouldAutoFocus;
+    return false;
   }
 
   return (

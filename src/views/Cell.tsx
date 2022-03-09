@@ -38,6 +38,7 @@ const Cell = ({row, col, content, onContentChanged, values, setValues, colJustif
 
   React.useEffect(() => {
     if (autoFocus) {
+      contentEditable.current.setText('');
       contentEditable.current.focus();
     }
   }, [autoFocus]);

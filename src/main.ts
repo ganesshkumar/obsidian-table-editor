@@ -74,7 +74,8 @@ export default class MarkdownTableEditorPlugin extends Plugin {
 			return;
 		}
 
-		const data = view.editor.getSelection();
+    let data = this.getData(view);
+  
     const activeLeaf = this.app.workspace.activeLeaf;
     
     await this.app.workspace.createLeafBySplit(activeLeaf, direction).setViewState({
@@ -86,5 +87,29 @@ export default class MarkdownTableEditorPlugin extends Plugin {
     this.app.workspace.revealLeaf(
       this.app.workspace.getLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW)[0]
     );
+  }
+
+  getData (view: MarkdownView) {
+    let data = undefined;
+    // If user has selected something. Take the selection
+    if (view.editor.somethingSelected()) {
+      data = view.editor.getSelection();
+    } else {
+      let { line } = view.editor.getCursor();
+      // If user has not selection anything, serach for empty lines above and below the cursor position and take them as data
+      if (view.editor.getLine(line).trim() !== '') {
+        let lineAbove = Math.max(line - 1, 0);
+        while (view.editor.getLine(lineAbove).trim() !== '' && lineAbove > 0) {
+          lineAbove--;
+        }
+        let lineBelow = Math.min(line + 1, view.editor.lineCount() - 1);
+        while (view.editor.getLine(lineBelow).trim() !== '' && lineBelow < view.editor.lineCount() - 1) {
+          lineBelow++;
+        }
+        data = view.editor.getRange({ line: lineAbove, ch: 0 }, { line: lineBelow, ch: view.editor.getLine(lineBelow).length });
+      }
+    }
+
+    return data;
   }
 }
