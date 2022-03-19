@@ -25,6 +25,15 @@ An Obsidian plugin to provide an editor for Markdown tables. It can open CSV, Mi
 
 ## 1. Usage Guide
 
+### Changelog 0.2.0
+Thank you [@cumany](https://github.com/cumany), for this release.
+1. Added "Update Table" button
+2. Added support for popover window (if obsidian-hover-editor plugin is installed)
+
+https://user-images.githubusercontent.com/42957010/158850763-875d1ce4-fded-4ca4-a000-848d8c8268f4.mp4
+
+
+
 [@emisjerry](https://github.com/emisjerry) has made a [video walkthrough](https://www.youtube.com/watch?v=rZX_ZVPOgC8) of this plugin in Chinese (with English subtitle). Thank you emisjerry! 
 
 ### 1.1 Create a New Table
