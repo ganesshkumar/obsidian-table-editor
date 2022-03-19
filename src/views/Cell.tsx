@@ -13,9 +13,10 @@ type CellProps = {
   setColJustify: (colJustify: string[]) => void
   onContentChanged: (row: number, col: number, content: string) => void
   autoFocus?: boolean
+  onFocus?: () => void // Not using it yet
 }
 
-const Cell = ({row, col, content, onContentChanged, values, setValues, colJustify, setColJustify, autoFocus=false}: CellProps) => {
+const Cell = ({row, col, content, onContentChanged, values, setValues, colJustify, setColJustify, autoFocus=false, onFocus}: CellProps) => {
   const contentEditable = React.useRef<HTMLSpanElement>();
   const contextMenu = React.useRef<HTMLSpanElement>();
 

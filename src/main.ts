@@ -4,6 +4,7 @@ import { addIcons } from 'utils/icons';
 import { parseInputData } from './utils/markdown';
 const VERTICAL_EDITOR_TEXT = 'Open Editor (Next to the Active View)';
 const HORIZONTAL_EDITOR_TEXT = 'Open Editor (Below the Active View)';
+const POPOVER_EDITOR_TEXT = "Open Editor (with the hover editor pluging)";
 
 export default class MarkdownTableEditorPlugin extends Plugin {
 	async onload() {
@@ -61,20 +62,31 @@ export default class MarkdownTableEditorPlugin extends Plugin {
 			}
     });
 
+    
     this.addCommand({
       id: 'markdown-table-editor-select-table-content',
       name: 'Select surrounding Table Content',
       editorCallback: async (_: Editor, view: MarkdownView) => {
         this.selectTableContent(view);
       }
-    })
-	}
+    });
+
+    if (this.app.plugins.plugins['obsidian-hover-editor'] !== undefined) {
+      this.addCommand({
+        id: "markdown-table-editor-open-in-popover",
+        name: POPOVER_EDITOR_TEXT,
+        editorCallback: async (_: Editor, __: MarkdownView) => {
+          this.activateView("popover");
+        }
+      });
+    }
+  }
 
 	onunload() {
 		this.app.workspace.detachLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW);
 	}
 
-	async activateView(direction: 'vertical' | 'horizontal' = 'vertical') {
+	async activateView(direction: 'vertical' | 'horizontal'| 'popover' = 'vertical') {
     this.app.workspace.detachLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW);
 
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -83,14 +95,23 @@ export default class MarkdownTableEditorPlugin extends Plugin {
 		}
 
     let data = this.getData(view)?.data;
-  
+    let { line } = view.editor.getCursor();
+    let _cursor = line;
     const activeLeaf = this.app.workspace.activeLeaf;
-    
-    await this.app.workspace.createLeafBySplit(activeLeaf, direction).setViewState({
+    let _leafid = activeLeaf.id;
+
+    let editorLeaf = undefined;
+    if (direction === 'popover') {
+      editorLeaf = this.app.plugins.plugins['obsidian-hover-editor'].spawnPopover();
+    } else {
+      editorLeaf = this.app.workspace.createLeafBySplit(activeLeaf, direction);
+    }
+
+    await editorLeaf.setViewState({
       type: MARKDOWN_TABLE_EDITOR_VIEW,
       active: true,
-			state: { data }
-    });
+      state: { data, leafId: _leafid, cursor: _cursor }
+    }); 
 
     this.app.workspace.revealLeaf(
       this.app.workspace.getLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW)[0]
@@ -98,7 +119,6 @@ export default class MarkdownTableEditorPlugin extends Plugin {
   }
 
   getData (view: MarkdownView) {
-    console.log('getData')
     let data = undefined;
     let startCursor = undefined;
     let endCursor = undefined;
@@ -108,7 +128,6 @@ export default class MarkdownTableEditorPlugin extends Plugin {
       data = view.editor.getSelection();
     } else {
       let { line } = view.editor.getCursor();
-      console.log('line',line)
       // If user has not selection anything, serach for empty lines above and below the cursor position and take them as data
       if (!!view.editor.getLine(line).trim()) {
         let lineAbove = Math.max(line - 1, 0);
@@ -132,17 +151,16 @@ export default class MarkdownTableEditorPlugin extends Plugin {
         startCursor = { line: lineAbove, ch: 0 };
         endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
 
-        console.log(startCursor, endCursor);
+        // Marking the selection to support update from the Table Editor
+        view.editor.setSelection(startCursor, endCursor);
         data = view.editor.getRange(startCursor, endCursor);
       }
     }
 
-    console.log(data, startCursor, endCursor);
     return {data, startCursor, endCursor};
   }
 
   selectTableContent (view: MarkdownView) {
-    console.log('selectTableContent')
     const {data, startCursor, endCursor} =  this.getData(view);
     const parsedData = parseInputData(data);
     if (parseInputData) {
