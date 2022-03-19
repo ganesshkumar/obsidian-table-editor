@@ -71,7 +71,7 @@ export default class MarkdownTableEditorPlugin extends Plugin {
       }
     });
 
-    if (this.app.plugins.plugins['obsidian-hover-editor'] !== undefined) {
+    if ((this.app as any).plugins.plugins['obsidian-hover-editor'] !== undefined) {
       this.addCommand({
         id: "markdown-table-editor-open-in-popover",
         name: POPOVER_EDITOR_TEXT,
@@ -98,11 +98,11 @@ export default class MarkdownTableEditorPlugin extends Plugin {
     let { line } = view.editor.getCursor();
     let _cursor = line;
     const activeLeaf = this.app.workspace.activeLeaf;
-    let _leafid = activeLeaf.id;
+    let _leafid = (activeLeaf as any).id;
 
     let editorLeaf = undefined;
     if (direction === 'popover') {
-      editorLeaf = this.app.plugins.plugins['obsidian-hover-editor'].spawnPopover();
+      editorLeaf = (this.app as any).plugins.plugins['obsidian-hover-editor'].spawnPopover();
     } else {
       editorLeaf = this.app.workspace.createLeafBySplit(activeLeaf, direction);
     }
