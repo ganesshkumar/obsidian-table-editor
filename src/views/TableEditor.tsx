@@ -4,12 +4,17 @@ import { parseInputData, sanitize, toMarkdown } from "../utils/markdown";
 import Cell from "./Cell";
 
 type Props = {
+  _leafid_data:string,
+  _cursor_data:string,
   inputData: string,
   updateViewData: (data: string) => void
   supressNotices: boolean
 }
 
-export const TableEditor = ({inputData, updateViewData, supressNotices = false}: Props) => {
+export const TableEditor = ({_leafid_data,_cursor_data,inputData, updateViewData, supressNotices = false}: Props) => {
+	let _leafid =_leafid_data;
+	let _cursor =_cursor_data;
+
   const [newRows, setNewRows] = React.useState(3);
   const [newCols, setNewCols] = React.useState(3);
   const [values, setValues] = React.useState(Array(2).fill(['']));
@@ -79,7 +84,39 @@ export const TableEditor = ({inputData, updateViewData, supressNotices = false}:
     }
     return false;
   }
-
+ 
+  const replaceCliked = () => {
+    let obsidian = require('obsidian');
+    console.log("_leafid:"+_leafid);
+    let leaf = this.app.workspace.getLeafById(_leafid);
+    this.app.workspace.setActiveLeaf(leaf, false, true);
+    let view = this.app.workspace.getActiveViewOfType(obsidian.MarkdownView);
+      //view.editor.replaceSelection(toMarkdown(values, colJustify));
+    let line = _cursor; 
+    if (!!view.editor.getLine(line).trim()) {
+          let lineAbove = Math.max(line - 1, 0);
+          if (!!view.editor.getLine(lineAbove).trim()) {
+            while (lineAbove > 0 && !!view.editor.getLine(lineAbove - 1).trim()) {
+              lineAbove--;
+            }
+          } else {
+            lineAbove = line;
+          }
+          let lineBelow = Math.min(line + 1, view.editor.lineCount() - 1);
+          if (!!view.editor.getLine(lineBelow).trim()) {
+            while (lineBelow + 1 < view.editor.lineCount() && !!view.editor.getLine(lineBelow + 1).trim()) {
+              lineBelow++;
+            }
+          } else {
+            lineBelow = line;
+          }
+          startCursor = { line: lineAbove, ch: 0 };
+          endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
+      
+      view.editor.replaceRange(toMarkdown(values, colJustify),startCursor, endCursor);
+       //setTimeout(view.editor.setSelection(startCursor, endCursor),100);
+        }
+    }
   return (
     <>
       <div className='mte button-container'>
@@ -104,7 +141,9 @@ export const TableEditor = ({inputData, updateViewData, supressNotices = false}:
       </div>
       <div className='mte button-container'>
         <button onClick={copyClicked}>{copyText}</button>
+        <button onClick={replaceCliked}>Update Tables</button>
       </div>
+      
     </>
   );
 };

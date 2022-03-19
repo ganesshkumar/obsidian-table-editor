@@ -151,5 +151,5 @@ export const toMarkdown = (values: any[][], colJustify: string[]): string => {
                 .map(row => lineformatter(row))
                 .join('\n');
 
-  return `${header}\n${alignMarker}\n${rows}\n`;
+  return `${header}\n${alignMarker}\n${rows}`;
 }
