@@ -1,4 +1,4 @@
-import { AppContext } from "context/context";
+import { useApp } from "context/hooks";
 import { Notice, MarkdownView } from "obsidian";
 import * as React from "react";
 import { parseInputData, sanitize, toMarkdown } from "../utils/markdown";
@@ -16,7 +16,7 @@ export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressN
 	let _leafid = leafId;
 	let _cursor = cursor;
 
-  const app = React.useContext(AppContext);
+  const app = useApp();
 
   const [newRows, setNewRows] = React.useState(3);
   const [newCols, setNewCols] = React.useState(3);
@@ -95,29 +95,27 @@ export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressN
     let view = app.workspace.getActiveViewOfType(MarkdownView);
     let line = parseInt(_cursor);
 
-    if (!!view.editor.getLine(line).trim()) {
-      let lineAbove = Math.max(line - 1, 0);
-      if (!!view.editor.getLine(lineAbove).trim()) {
-        while (lineAbove > 0 && !!view.editor.getLine(lineAbove - 1).trim()) {
-          lineAbove--;
-        }
-      } else {
-        lineAbove = line;
+    let lineAbove = Math.max(line - 1, 0);
+    if (!!view.editor.getLine(lineAbove).trim()) {
+      while (lineAbove > 0 && !!view.editor.getLine(lineAbove - 1).trim()) {
+        lineAbove--;
       }
-      let lineBelow = Math.min(line + 1, view.editor.lineCount() - 1);
-      if (!!view.editor.getLine(lineBelow).trim()) {
-        while (lineBelow + 1 < view.editor.lineCount() && !!view.editor.getLine(lineBelow + 1).trim()) {
-          lineBelow++;
-        }
-      } else {
-        lineBelow = line;
-      }
-
-      const startCursor = { line: lineAbove, ch: 0 };
-      const endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
-      
-      view.editor.replaceRange(toMarkdown(values, colJustify), startCursor, endCursor);
+    } else {
+      lineAbove = line;
     }
+    let lineBelow = Math.min(line + 1, view.editor.lineCount() - 1);
+    if (!!view.editor.getLine(lineBelow).trim()) {
+      while (lineBelow + 1 < view.editor.lineCount() && !!view.editor.getLine(lineBelow + 1).trim()) {
+        lineBelow++;
+      }
+    } else {
+      lineBelow = line;
+    }
+
+    const startCursor = { line: lineAbove, ch: 0 };
+    const endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
+
+    view.editor.replaceRange(toMarkdown(values, colJustify), startCursor, endCursor);
   }
 
   return (
