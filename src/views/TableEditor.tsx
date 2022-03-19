@@ -20,7 +20,7 @@ export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressN
 
   const [newRows, setNewRows] = React.useState(3);
   const [newCols, setNewCols] = React.useState(3);
-  const [values, setValues] = React.useState(Array(2).fill(['']));
+  const [values, setValues] = React.useState([[''], ['']]);
   const [colJustify, setColJustify] = React.useState([])
   const [copyText, setCopyText] = React.useState('Copy as Markdown');
   const [autoFocusCell, setAutoFocusCell] = React.useState({row: -1, col: -1});
@@ -45,7 +45,7 @@ export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressN
       if (!supressNotices) {
         new Notice("Selection is not a valid Markdown table or CSV or Excel data. Creating a new table!");
       }
-      data = Array(2).fill(['']);
+      data = [[''], ['']];
     }
 
     data = sanitize(data);
@@ -75,7 +75,7 @@ export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressN
   }
 
   const clearClicked = () => {
-    setValues(Array(2).fill(['']));
+    setValues([[''], ['']]);
     setColJustify(Array(1).fill('LEFT'));
   }
 

@@ -71,8 +71,8 @@ export default class MarkdownTableEditorPlugin extends Plugin {
       }
     });
 
-  if (this.app.plugins.plugins['obsidian-hover-editor'] !== undefined) {
-    this.addCommand({
+    if (this.app.plugins.plugins['obsidian-hover-editor'] !== undefined) {
+      this.addCommand({
         id: "markdown-table-editor-open-in-popover",
         name: POPOVER_EDITOR_TEXT,
         editorCallback: async (_: Editor, __: MarkdownView) => {

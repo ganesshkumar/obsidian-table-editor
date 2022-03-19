@@ -124,6 +124,7 @@ The following operations are supported
 
 ## 4. Acknowledgements
 1. Special thanks for [@FelipeRearden](https://github.com/FelipeRearden) for his valuable feedback and feature suggestions that has helped shaping up this plugin!
+2. Thank you [@cumany](https://github.com/cumany), for adding "Update Table" button and adding support for popover window.
 
 ## 5. Other Obsidian plusins/tools made by me
 
