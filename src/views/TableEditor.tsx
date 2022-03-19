@@ -1,26 +1,29 @@
-import { Notice } from "obsidian";
+import { AppContext } from "context/context";
+import { Notice, MarkdownView } from "obsidian";
 import * as React from "react";
 import { parseInputData, sanitize, toMarkdown } from "../utils/markdown";
 import Cell from "./Cell";
 
 type Props = {
-  _leafid_data:string,
-  _cursor_data:string,
+  leafId: string,
+  cursor: string,
   inputData: string,
   updateViewData: (data: string) => void
   supressNotices: boolean
 }
 
-export const TableEditor = ({_leafid_data,_cursor_data,inputData, updateViewData, supressNotices = false}: Props) => {
-	let _leafid =_leafid_data;
-	let _cursor =_cursor_data;
+export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressNotices = false}: Props) => {
+	let _leafid = leafId;
+	let _cursor = cursor;
+
+  const app = React.useContext(AppContext);
 
   const [newRows, setNewRows] = React.useState(3);
   const [newCols, setNewCols] = React.useState(3);
   const [values, setValues] = React.useState(Array(2).fill(['']));
   const [colJustify, setColJustify] = React.useState([])
   const [copyText, setCopyText] = React.useState('Copy as Markdown');
-  const [autoFocusRow, setAutoFocusRow] = React.useState(0);
+  const [autoFocusCell, setAutoFocusCell] = React.useState({row: -1, col: -1});
 
   const onContentChanged = (rowIndex: number, colIndex: number, value: string) => {
     const newValues = [...values];
@@ -30,9 +33,9 @@ export const TableEditor = ({_leafid_data,_cursor_data,inputData, updateViewData
 
   const computeAutoFocusRow = React.useCallback((values: string[][]) => {
     if (!values || !values.length || values.length === 0 || !values[0] || !values[0].length || values[0].length === 0 || !values[0][0]) {
-      setAutoFocusRow(0);
+      setAutoFocusCell({row: 0, col: 0});
     } else {
-      setAutoFocusRow(1);
+      setAutoFocusCell({row: 1, col: 0});
     }
   }, [inputData]);
 
@@ -77,46 +80,46 @@ export const TableEditor = ({_leafid_data,_cursor_data,inputData, updateViewData
   }
 
   const shouldAutoFocus = (rowIndex: number, colIndex: number) => {
-    if (colIndex === 0) {
-      if (rowIndex === autoFocusRow) {
-        return true;
-      }
+    if (colIndex === autoFocusCell.col && rowIndex === autoFocusCell.row) {
+      return true;
     }
     return false;
   }
- 
-  const replaceCliked = () => {
-    let obsidian = require('obsidian');
-    console.log("_leafid:"+_leafid);
-    let leaf = this.app.workspace.getLeafById(_leafid);
-    this.app.workspace.setActiveLeaf(leaf, false, true);
-    let view = this.app.workspace.getActiveViewOfType(obsidian.MarkdownView);
-      //view.editor.replaceSelection(toMarkdown(values, colJustify));
-    let line = _cursor; 
+
+  const replaceClicked = () => {
+    const editorLeaf = app.workspace.activeLeaf;
+
+    let leaf = app.workspace.getLeafById(_leafid);
+    app.workspace.setActiveLeaf(leaf, false, true);
+    
+    let view = app.workspace.getActiveViewOfType(MarkdownView);
+    let line = parseInt(_cursor);
+
     if (!!view.editor.getLine(line).trim()) {
-          let lineAbove = Math.max(line - 1, 0);
-          if (!!view.editor.getLine(lineAbove).trim()) {
-            while (lineAbove > 0 && !!view.editor.getLine(lineAbove - 1).trim()) {
-              lineAbove--;
-            }
-          } else {
-            lineAbove = line;
-          }
-          let lineBelow = Math.min(line + 1, view.editor.lineCount() - 1);
-          if (!!view.editor.getLine(lineBelow).trim()) {
-            while (lineBelow + 1 < view.editor.lineCount() && !!view.editor.getLine(lineBelow + 1).trim()) {
-              lineBelow++;
-            }
-          } else {
-            lineBelow = line;
-          }
-          startCursor = { line: lineAbove, ch: 0 };
-          endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
-      
-      view.editor.replaceRange(toMarkdown(values, colJustify),startCursor, endCursor);
-       //setTimeout(view.editor.setSelection(startCursor, endCursor),100);
+      let lineAbove = Math.max(line - 1, 0);
+      if (!!view.editor.getLine(lineAbove).trim()) {
+        while (lineAbove > 0 && !!view.editor.getLine(lineAbove - 1).trim()) {
+          lineAbove--;
         }
+      } else {
+        lineAbove = line;
+      }
+      let lineBelow = Math.min(line + 1, view.editor.lineCount() - 1);
+      if (!!view.editor.getLine(lineBelow).trim()) {
+        while (lineBelow + 1 < view.editor.lineCount() && !!view.editor.getLine(lineBelow + 1).trim()) {
+          lineBelow++;
+        }
+      } else {
+        lineBelow = line;
+      }
+
+      const startCursor = { line: lineAbove, ch: 0 };
+      const endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
+      
+      view.editor.replaceRange(toMarkdown(values, colJustify), startCursor, endCursor);
     }
+  }
+
   return (
     <>
       <div className='mte button-container'>
@@ -127,7 +130,6 @@ export const TableEditor = ({_leafid_data,_cursor_data,inputData, updateViewData
       </div>
       <div className='mte button-container'>
         <button onClick={copyClicked}>{copyText}</button>
-        {/* <svg viewBox="0 0 100 100" className="checkbox-glyph" width="18" height="18"><path fill="currentColor" stroke="currentColor" d="M89.9,20c-0.9,0-1.7,0.4-2.3,1l-51,51l-21-21c-0.8-0.9-2.1-1.2-3.2-0.9s-2.1,1.2-2.4,2.4c-0.3,1.2,0,2.4,0.9,3.2L34.3,79 c1.3,1.3,3.4,1.3,4.7,0l53.3-53.3c1-1,1.3-2.4,0.7-3.7C92.6,20.7,91.3,19.9,89.9,20z"></path></svg> */}
       </div>
       <div className="mte grid" style={{
         gridTemplateColumns: `repeat(${values[0]?.length}, 1fr)`
@@ -135,13 +137,20 @@ export const TableEditor = ({_leafid_data,_cursor_data,inputData, updateViewData
         {
           values.map((row, rowIdx) => 
             row.map((value: string, colIdx: number) => 
-              <Cell key={`${rowIdx}-${colIdx}`} content={value} row={rowIdx} col={colIdx} values={values} setValues={setValues} colJustify={colJustify} setColJustify={setColJustify} onContentChanged={onContentChanged} autoFocus={shouldAutoFocus(rowIdx, colIdx)}/>))
+              <Cell key={`${rowIdx}-${colIdx}`} 
+                row={rowIdx} col={colIdx}
+                content={value} values={values} setValues={setValues} 
+                colJustify={colJustify} setColJustify={setColJustify} 
+                onContentChanged={onContentChanged} 
+                autoFocus={shouldAutoFocus(rowIdx, colIdx)} 
+                onFocus={() => setAutoFocusCell({row: rowIdx, col: colIdx})}
+              />))
           .flat()
         }
       </div>
       <div className='mte button-container'>
         <button onClick={copyClicked}>{copyText}</button>
-        <button onClick={replaceCliked}>Update Tables</button>
+        <button onClick={replaceClicked}>Update Table</button>
       </div>
       
     </>

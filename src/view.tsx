@@ -26,7 +26,7 @@ export class TableView extends ItemView {
       this.state = state;
       ReactDOM.render(
         <AppContext.Provider value={this.app}>
-          <TableEditor inputData={state.data} updateViewData={(data: string) => this.state.data = data} supressNotices={false} />
+          <TableEditor leafId={state.leafId} cursor={state.cursor} inputData={state.data} updateViewData={(data: string) => this.state.data = data} supressNotices={false} />
         </AppContext.Provider>,
         this.containerEl.children[1]
       );
@@ -41,7 +41,7 @@ export class TableView extends ItemView {
   async onOpen() {
     ReactDOM.render(
       <AppContext.Provider value={this.app}>
-        <TableEditor inputData='' updateViewData={(data: string) => this.state.data = data} supressNotices={true} />
+        <TableEditor leafId='' cursor='' inputData='' updateViewData={(data: string) => this.state.data = data} supressNotices={true} />
       </AppContext.Provider>,
       this.containerEl.children[1]
     );
@@ -50,4 +50,8 @@ export class TableView extends ItemView {
   async onClose() {
     ReactDOM.unmountComponentAtNode(this.containerEl.children[1]);
   }
+
+  registerDomEvent(el: any, type: FocusEvent, callback: any): void {
+    console.log('focssed')
+  } 
 }
