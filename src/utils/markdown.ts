@@ -47,6 +47,17 @@ export function parseMarkdownTable(data: string): any[][] | undefined {
   return undefined;
 }
 
+function sanitizeWikiLinks(input: string): string {
+  const matches = (input || '').matchAll(/\[\[\w*\|\w*\]\]/g);
+  let match = matches.next();
+  while (!match.done) {
+    const value = match.value['0'];
+    input = input.replace(value, value.replace('|', '\\|'));
+    match = matches.next()
+  }
+  return input;
+}
+
 function extractAfterContent(input: string[][]): string[][] {
   if (input && input[0]?.length && input[0].length > 1) {
     let idx = -1;
@@ -62,18 +73,45 @@ function extractAfterContent(input: string[][]): string[][] {
   return [] as string[][];
 }
 
-function sanitizeWikiLinks(input: string): string {
-  const matches = (input || '').matchAll(/\[\[\w*\|\w*\]\]/g);
-  let match = matches.next();
-  while (!match.done) {
-    const value = match.value['0'];
-    console.log('replacing', value)
-    if (!input.contains('\\|')) {
-      input = input.replace(value, value.replace('|', '\\|'));
-    }
-    match = matches.next()
+function removeAlignmentRow(input: string[][]) {
+  // Remove the second row that represents the alignment
+  if (input.length > 1) {
+    input.splice(1, 1);
   }
-  return input;
+}
+
+function mergeWikiLinkCells(input: string[][]): string[][] {
+  return input.map((row: string[]) => {
+    let writeIndex = 0;
+    const result: string[] = [];
+
+    for (let index = 0; index < row.length; index++) {
+      // Last cell in a row
+      if (index === row.length - 1) {
+        result.push(row[index]);
+        continue;
+      }
+
+      if (row[index].includes('[[') && row[index].endsWith('\\') && row[index + 1].includes(']]')) {
+        // Cells with wiki links
+        let current = row[index];
+        let offset = 1;
+        while (current.includes('[[') && current.endsWith('\\') && row[index + offset].includes(']]')) {
+          current = `${current}|${row[index + offset]}`;
+          offset++;
+        }
+        result[writeIndex] = current;
+        writeIndex++;
+        index = index + offset;
+      } else {
+        // Normal cells
+        result[writeIndex] = row[index];
+        writeIndex++;
+      }
+    }
+
+    return result;
+  });
 }
 
 const papaConfig = {
@@ -92,15 +130,7 @@ export function parseInputData(input: string): { content: string[][], afterConte
 
     if (meta.delimiter === '|') {
       // Markdown table
-      // Remove the second row that represents the alignment
-      if (data.length > 1) {
-        data.splice(1, 1);
-      }
-
-      data = data.map((row: string[]) => {
-
-        return row;
-      })
+      removeAlignmentRow(data);
 
       // Remove the first and last column that are empty when we parsed the data
       data = data.map((row: string[]) => {
@@ -110,26 +140,7 @@ export function parseInputData(input: string): { content: string[][], afterConte
       });
 
       // Handing [[link|alias]] in a cell
-      data = data.map((row: string[]) => {
-        let writeIndex = 0;
-        const result: string[] = [];
-        for (let index = 0; index < row.length; index++) {
-          if (index === row.length - 1) {
-            result.push(row[index]);
-            continue;
-          }
-
-          if (row[index].includes('[[') && row[index].endsWith('\\') && row[index + 1].includes(']]')) {
-            result[writeIndex] = `${row[index]}|${row[index + 1]}`;
-            writeIndex++;
-            index++;
-          } else {
-            result[writeIndex] = row[index];
-            writeIndex++;
-          }
-        }
-        return result;
-      });
+      data = mergeWikiLinkCells(data);
     }
 
     return {
