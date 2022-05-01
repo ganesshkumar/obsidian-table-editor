@@ -12,18 +12,19 @@ type Props = {
   supressNotices: boolean
 }
 
-export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressNotices = false}: Props) => {
-	let _leafid = leafId;
-	let _cursor = cursor;
+export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supressNotices = false }: Props) => {
+  let _leafid = leafId;
+  let _cursor = cursor;
 
   const app = useApp();
 
   const [newRows, setNewRows] = React.useState(3);
   const [newCols, setNewCols] = React.useState(3);
   const [values, setValues] = React.useState([[''], ['']]);
+  const [afterValue, setAfterValue] = React.useState('');
   const [colJustify, setColJustify] = React.useState([])
   const [copyText, setCopyText] = React.useState('Copy as Markdown');
-  const [autoFocusCell, setAutoFocusCell] = React.useState({row: -1, col: -1});
+  const [autoFocusCell, setAutoFocusCell] = React.useState({ row: -1, col: -1 });
 
   const onContentChanged = (rowIndex: number, colIndex: number, value: string) => {
     const newValues = [...values];
@@ -33,26 +34,35 @@ export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressN
 
   const computeAutoFocusRow = React.useCallback((values: string[][]) => {
     if (!values || !values.length || values.length === 0 || !values[0] || !values[0].length || values[0].length === 0 || !values[0][0]) {
-      setAutoFocusCell({row: 0, col: 0});
+      setAutoFocusCell({ row: 0, col: 0 });
     } else {
-      setAutoFocusCell({row: 1, col: 0});
+      setAutoFocusCell({ row: 1, col: 0 });
     }
   }, [inputData]);
 
   React.useEffect(() => {
-    let data = parseInputData(inputData);
-    if (!data) {
+    let result = parseInputData(inputData);
+
+    if (!result) {
+      result = { content: undefined, afterContent: [] as string[][] }
+    }
+
+    let { content, afterContent } = result;
+
+    if (!content) {
       if (!supressNotices) {
         new Notice("Selection is not a valid Markdown table or CSV or Excel data. Creating a new table!");
       }
-      data = [[''], ['']];
+      content = [[''], ['']];
     }
 
-    data = sanitize(data);
+    content = sanitize(content);
+    const processedAfterContent = afterContent.map(row => row.join('')).join('  \n');
 
-    setValues(data);
-    setColJustify(Array(data[0].length).fill('LEFT'));
-    computeAutoFocusRow(data);
+    setValues(content);
+    setColJustify(Array(content[0].length).fill('LEFT'));
+    setAfterValue(processedAfterContent);
+    computeAutoFocusRow(content);
   }, [inputData]);
 
   React.useEffect(() => {
@@ -61,12 +71,6 @@ export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressN
     }
     updateViewData(toMarkdown(values, colJustify));
   }, [values, colJustify]);
-
-
-  const copyClicked = () => {
-    setCopyText('Copied!');
-    navigator?.clipboard?.writeText(toMarkdown(values, colJustify));
-  }
 
   const newTableClicked = () => {
     const newValues = Array(newRows).fill([]).map(_ => Array(newCols).fill(''));
@@ -86,12 +90,22 @@ export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressN
     return false;
   }
 
+  const getOutput = () => {
+    const tableContent = toMarkdown(values, colJustify);
+    return `${tableContent}  \n${afterValue}`;
+  }
+
+  const copyClicked = () => {
+    setCopyText('Copied!');
+    navigator?.clipboard?.writeText(getOutput());
+  }
+
   const replaceClicked = () => {
     const editorLeaf = app.workspace.activeLeaf;
 
     let leaf = app.workspace.getLeafById(_leafid);
     app.workspace.setActiveLeaf(leaf, false, true);
-    
+
     let view = app.workspace.getActiveViewOfType(MarkdownView);
     let line = parseInt(_cursor);
 
@@ -115,13 +129,13 @@ export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressN
     const startCursor = { line: lineAbove, ch: 0 };
     const endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
 
-    view.editor.replaceRange(toMarkdown(values, colJustify), startCursor, endCursor);
+    view.editor.replaceRange(getOutput(), startCursor, endCursor);
   }
 
   return (
     <>
       <div className='mte button-container'>
-        Rows : <input type='text' onChange={e => setNewRows(parseInt(e.target.value))} placeholder='3'/>
+        Rows : <input type='text' onChange={e => setNewRows(parseInt(e.target.value))} placeholder='3' />
         Columns : <input type='text' onChange={e => setNewCols(parseInt(e.target.value))} placeholder='3' />
         <button onClick={newTableClicked}>New Table</button>
         <button onClick={clearClicked}>Clear Table</button>
@@ -133,24 +147,24 @@ export const TableEditor = ({leafId, cursor, inputData, updateViewData, supressN
         gridTemplateColumns: `repeat(${values[0]?.length}, 1fr)`
       }}>
         {
-          values.map((row, rowIdx) => 
-            row.map((value: string, colIdx: number) => 
-              <Cell key={`${rowIdx}-${colIdx}`} 
+          values.map((row, rowIdx) =>
+            row.map((value: string, colIdx: number) =>
+              <Cell key={`${rowIdx}-${colIdx}`}
                 row={rowIdx} col={colIdx}
-                content={value} values={values} setValues={setValues} 
-                colJustify={colJustify} setColJustify={setColJustify} 
-                onContentChanged={onContentChanged} 
-                autoFocus={shouldAutoFocus(rowIdx, colIdx)} 
-                onFocus={() => setAutoFocusCell({row: rowIdx, col: colIdx})}
+                content={value} values={values} setValues={setValues}
+                colJustify={colJustify} setColJustify={setColJustify}
+                onContentChanged={onContentChanged}
+                autoFocus={shouldAutoFocus(rowIdx, colIdx)}
+                onFocus={() => setAutoFocusCell({ row: rowIdx, col: colIdx })}
               />))
-          .flat()
+            .flat()
         }
       </div>
       <div className='mte button-container'>
         <button onClick={copyClicked}>{copyText}</button>
         <button onClick={replaceClicked}>Update Table</button>
       </div>
-      
+
     </>
   );
 };

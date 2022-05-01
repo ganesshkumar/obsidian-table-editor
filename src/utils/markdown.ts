@@ -47,10 +47,21 @@ export function parseMarkdownTable(data: string): any[][] | undefined {
   return undefined;
 }
 
-export function parseInputData(input: string): any[][] | undefined {
-  let {data, meta}: {data: string[][], meta: any} = Papa.parse((input || '').trim());
+export function parseInputData(input: string): { content: string[][], afterContent: string[][] } | undefined {
+  let { data, meta }: { data: string[][], meta: any } = Papa.parse((input || '').trim());
+  let afterContent: string[][] = undefined;
 
   if (data && data[0]?.length && data[0].length > 1) {
+    // Extract afterContent
+    let idx = -1;
+    for (idx = 0; idx < data?.length; idx++) {
+      if (data[idx]?.length == 1) {
+        break;
+      }
+    }
+
+    afterContent = data.splice(idx);
+
     if (meta.delimiter === '|') {
       // Markdown table
       // Remove the second row that represents the alignment
@@ -88,8 +99,12 @@ export function parseInputData(input: string): any[][] | undefined {
       });
     }
 
-    return data;
+    return {
+      content: data,
+      afterContent
+    };
   }
+
   return undefined;
 }
 
@@ -108,12 +123,12 @@ export function sanitize(data: string[][]) {
 export const toMarkdown = (values: any[][], colJustify: string[]): string => {
   const cols = values[0]?.length;
   let maxColWidth = Array(cols).fill(0);
-  
+
   // Find column width for result
   for (let rowIdx = 0; rowIdx < values.length; rowIdx++) {
     for (let colIdx = 0; colIdx < values[0].length; colIdx++) {
-      maxColWidth[colIdx] = values[rowIdx][colIdx].length > maxColWidth[colIdx] ? 
-                              values[rowIdx][colIdx].length : maxColWidth[colIdx];
+      maxColWidth[colIdx] = values[rowIdx][colIdx].length > maxColWidth[colIdx] ?
+        values[rowIdx][colIdx].length : maxColWidth[colIdx];
     }
   }
 
@@ -148,8 +163,8 @@ export const toMarkdown = (values: any[][], colJustify: string[]): string => {
   alignMarker = `|${alignMarker}`;
 
   const rows = values.slice(1)
-                .map(row => lineformatter(row))
-                .join('\n');
+    .map(row => lineformatter(row))
+    .join('\n');
 
   return `${header}\n${alignMarker}\n${rows}`;
 }

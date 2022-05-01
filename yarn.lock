@@ -587,10 +587,10 @@ mime@^1.4.1:
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.6.0.tgz#32cd9e5c64553bd58d19a568af452acff04981b1"
   integrity sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==
 
-moment@2.29.1:
-  version "2.29.1"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
-  integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
+moment@2.29.2:
+  version "2.29.2"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.2.tgz#00910c60b20843bcba52d37d58c628b47b1f20e4"
+  integrity sha512-UgzG4rvxYpN15jgCmVJwac49h9ly9NurikMWGPdVxm8GZD6XjkKPxDTjQQ43gtGgnV3X0cAyWDdP2Wexoquifg==
 
 ms@2.1.2:
   version "2.1.2"
@@ -616,15 +616,15 @@ object-assign@^4.1.1:
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"
   integrity sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=
 
-obsidian@^0.13.30:
-  version "0.13.30"
-  resolved "https://registry.yarnpkg.com/obsidian/-/obsidian-0.13.30.tgz#215697376c5c0059d7661df400440d97224d3f95"
-  integrity sha512-uAOrIyeHE9qYzg1Qjfpy/qlyLUFX9oyKWeHYO8NVDoI+pm5VUTMe7XWcsXPwb9iVsVmggVJcdV15Vqm9bljhxQ==
+obsidian@^0.14.6:
+  version "0.14.6"
+  resolved "https://registry.yarnpkg.com/obsidian/-/obsidian-0.14.6.tgz#010e16da3a1a7725f5e91beb9f14ec8abd00c15d"
+  integrity sha512-oXPJ8Zt10WhN19bk5l4mZuXRZbbdT1QoMgxGGJ0bB7UcJa0bozDzugS5L/QiV9gDoujpUPxDWNVahEel6r0Fpw==
   dependencies:
     "@codemirror/state" "^0.19.6"
     "@codemirror/view" "^0.19.31"
     "@types/codemirror" "0.0.108"
-    moment "2.29.1"
+    moment "2.29.2"
 
 papaparse@^5.3.1:
   version "5.3.1"
