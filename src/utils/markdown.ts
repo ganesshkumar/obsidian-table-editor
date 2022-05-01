@@ -47,20 +47,48 @@ export function parseMarkdownTable(data: string): any[][] | undefined {
   return undefined;
 }
 
-export function parseInputData(input: string): { content: string[][], afterContent: string[][] } | undefined {
-  let { data, meta }: { data: string[][], meta: any } = Papa.parse((input || '').trim());
-  let afterContent: string[][] = undefined;
-
-  if (data && data[0]?.length && data[0].length > 1) {
-    // Extract afterContent
+function extractAfterContent(input: string[][]): string[][] {
+  if (input && input[0]?.length && input[0].length > 1) {
     let idx = -1;
-    for (idx = 0; idx < data?.length; idx++) {
-      if (data[idx]?.length == 1) {
+    for (idx = 0; idx < input?.length; idx++) {
+      if (input[idx]?.length == 1) {
         break;
       }
     }
 
-    afterContent = data.splice(idx);
+    return input.splice(idx);
+  }
+
+  return [] as string[][];
+}
+
+function sanitizeWikiLinks(input: string): string {
+  const matches = (input || '').matchAll(/\[\[\w*\|\w*\]\]/g);
+  let match = matches.next();
+  while (!match.done) {
+    const value = match.value['0'];
+    console.log('replacing', value)
+    if (!input.contains('\\|')) {
+      input = input.replace(value, value.replace('|', '\\|'));
+    }
+    match = matches.next()
+  }
+  return input;
+}
+
+const papaConfig = {
+  delimiter: '|',
+  escapeChar: '\\',
+}
+
+export function parseInputData(input: string): { content: string[][], afterContent: string[][] } | undefined {
+  input = sanitizeWikiLinks(input);
+
+  let { data, meta }: { data: string[][], meta: any } = Papa.parse((input || '').trim(), papaConfig);
+  let afterContent: string[][] = undefined;
+
+  if (data && data[0]?.length && data[0].length > 1) {
+    afterContent = extractAfterContent(data);
 
     if (meta.delimiter === '|') {
       // Markdown table
@@ -68,6 +96,11 @@ export function parseInputData(input: string): { content: string[][], afterConte
       if (data.length > 1) {
         data.splice(1, 1);
       }
+
+      data = data.map((row: string[]) => {
+
+        return row;
+      })
 
       // Remove the first and last column that are empty when we parsed the data
       data = data.map((row: string[]) => {
