@@ -1,4 +1,6 @@
+import MarkdownTableEditorPlugin from 'main';
 import { MarkdownView, Plugin } from 'obsidian';
+
 import { MARKDOWN_TABLE_EDITOR_VIEW, TableView } from 'view';
 
 export const registerViews = (plugin: Plugin) => {
@@ -12,8 +14,8 @@ export const activateMarkdownEditorOnRight = (plugin: Plugin) => activateView(pl
 export const activateMarkdownEditorBelow = (plugin: Plugin) => activateView(plugin, 'horizontal');
 export const activateMarkdownEditorInPopup = (plugin: Plugin) => activateView(plugin, 'popover');
 
-export const activateMarkdownEditorInDefaultDirection = (plugin: Plugin) => {
-  const defaultDirection = 'vertical';
+export const activateMarkdownEditorInDefaultDirection = (plugin: MarkdownTableEditorPlugin) => {
+  const defaultDirection = plugin.settings.defaultDirection;
   activateView(plugin, defaultDirection);
 }
 

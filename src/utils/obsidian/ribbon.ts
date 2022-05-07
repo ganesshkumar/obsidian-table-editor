@@ -1,16 +1,18 @@
-import { Menu, Plugin } from 'obsidian';
+import MarkdownTableEditorPlugin from 'main';
+import { Menu } from 'obsidian';
 import { VERTICAL_EDITOR_TEXT, HORIZONTAL_EDITOR_TEXT, POPOVER_EDITOR_TEXT } from '../../constants';
 import {
   activateMarkdownEditorOnRight,
   activateMarkdownEditorBelow,
-  activateMarkdownEditorInPopup
+  activateMarkdownEditorInPopup,
+  activateMarkdownEditorInDefaultDirection
 } from './view';
 
 
-export const registerRibbonIcons = (plugin: Plugin) => {
+export const registerRibbonIcons = (plugin: MarkdownTableEditorPlugin) => {
   plugin.addRibbonIcon("spreadsheet", "Open Markdown Table Editor", (event) => {
     if (event.type == 'click') {
-      activateMarkdownEditorOnRight(plugin);
+      activateMarkdownEditorInDefaultDirection(plugin);
       event.preventDefault();
       return;
     }
