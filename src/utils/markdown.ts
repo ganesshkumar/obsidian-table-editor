@@ -86,30 +86,32 @@ const papaConfig = {
   escapeChar: '\\',
 }
 
-export function parseInputData(input: string): { content: string[][], afterContent: string[][], beforeContent: string[][] } | undefined {
+export function parseInputData(input: string): { content: string[][], afterContent: string[][], beforeContent: string[][], isInsideCallout: boolean } | undefined {
   input = sanitizeWikiLinks(input);
 
   let { data, meta }: { data: string[][], meta: any } = Papa.parse((input || '').trim(), papaConfig);
   let afterContent: string[][] = undefined;
   let beforeContent: string[][] = undefined;
-
-  console.log('data')
-  console.log(data)
+  let leftContent: string[] = [] as string[];
 
   if (data && data[0]?.length) {
     beforeContent = extractBeforeContent(data);
     afterContent = extractAfterContent(data);
 
-    if (meta.delimiter === '|') {
-      // Markdown table
-      removeAlignmentRow(data);
 
+    if (meta.delimiter === '|') {
       // Remove the first and last column that are empty when we parsed the data
       data = data.map((row: string[]) => {
         row.splice(row.length - 1, 1);
-        row.splice(0, 1);
+
+        const dataOnLeft = row.splice(0, 1)
+        leftContent.push(dataOnLeft.join(''));
+
         return row;
       });
+
+      // Markdown table
+      removeAlignmentRow(data);
 
       // Handing [[link|alias]] in a cell
       data = mergeWikiLinkCells(data);
@@ -119,10 +121,10 @@ export function parseInputData(input: string): { content: string[][], afterConte
       content: data,
       afterContent,
       beforeContent,
+      isInsideCallout: leftContent.map(v => v.trim()).every(v => v === '>'),
     };
   }
 
-  console.log('returning undefined')
   return undefined;
 }
 
@@ -138,7 +140,7 @@ export function sanitize(data: string[][]) {
   });
 }
 
-export const toMarkdown = (values: any[][], colJustify: string[]): string => {
+export const toMarkdown = (values: any[][], colJustify: string[], isInsideCallout: boolean = false): string => {
   const cols = values[0]?.length;
   let maxColWidth = Array(cols).fill(0);
 
@@ -184,5 +186,10 @@ export const toMarkdown = (values: any[][], colJustify: string[]): string => {
     .map(row => lineformatter(row))
     .join('\n');
 
-  return `${header}\n${alignMarker}\n${rows}`;
+  let markdown = `${header}\n${alignMarker}\n${rows}`;
+  if (isInsideCallout) {
+    markdown = markdown.split('\n').map(row => `> ${row}`).join('\n');
+  }
+
+  return markdown;
 }
