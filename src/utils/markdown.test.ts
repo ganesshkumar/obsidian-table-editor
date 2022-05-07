@@ -174,7 +174,7 @@ describe('parse input content', () => {
   });
 
   it("parses plain csv data", () => {
-    const { content, afterContent } = parseInputData(simpleCSV);
+    const { content, afterContent, isInsideCallout } = parseInputData(simpleCSV);
 
     expect(content).not.toBeNull();
     expect(content.length).toBe(2);
@@ -187,6 +187,8 @@ describe('parse input content', () => {
 
     expect(afterContent).not.toBeNull();
     expect(afterContent.length).toBe(0);
+
+    expect(isInsideCallout).toBeFalsy();
   });
 });
 
