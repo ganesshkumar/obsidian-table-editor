@@ -26,6 +26,21 @@ function extractAfterContent(input: string[][]): string[][] {
   return [] as string[][];
 }
 
+function extractBeforeContent(input: string[][]): string[][] {
+  if (input && input[0]) {
+    let idx = -1;
+    for (idx = 0; idx < input?.length; idx++) {
+      if (input[idx]?.length > 1) {
+        break;
+      }
+    }
+
+    return input.splice(0, idx);
+  }
+
+  return [] as string[][];
+}
+
 function removeAlignmentRow(input: string[][]) {
   // Remove the second row that represents the alignment
   if (input.length > 1) {
@@ -71,13 +86,18 @@ const papaConfig = {
   escapeChar: '\\',
 }
 
-export function parseInputData(input: string): { content: string[][], afterContent: string[][] } | undefined {
+export function parseInputData(input: string): { content: string[][], afterContent: string[][], beforeContent: string[][] } | undefined {
   input = sanitizeWikiLinks(input);
 
   let { data, meta }: { data: string[][], meta: any } = Papa.parse((input || '').trim(), papaConfig);
   let afterContent: string[][] = undefined;
+  let beforeContent: string[][] = undefined;
 
-  if (data && data[0]?.length && data[0].length > 1) {
+  console.log('data')
+  console.log(data)
+
+  if (data && data[0]?.length) {
+    beforeContent = extractBeforeContent(data);
     afterContent = extractAfterContent(data);
 
     if (meta.delimiter === '|') {
@@ -97,10 +117,12 @@ export function parseInputData(input: string): { content: string[][], afterConte
 
     return {
       content: data,
-      afterContent
+      afterContent,
+      beforeContent,
     };
   }
 
+  console.log('returning undefined')
   return undefined;
 }
 

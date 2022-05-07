@@ -22,6 +22,7 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
   const [newCols, setNewCols] = React.useState(3);
   const [values, setValues] = React.useState([[''], ['']]);
   const [afterValue, setAfterValue] = React.useState('');
+  const [beforeValue, setBeforeValue] = React.useState('');
   const [colJustify, setColJustify] = React.useState([])
   const [copyText, setCopyText] = React.useState('Copy as Markdown');
   const [autoFocusCell, setAutoFocusCell] = React.useState({ row: -1, col: -1 });
@@ -44,10 +45,14 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
     let result = parseInputData(inputData);
 
     if (!result) {
-      result = { content: undefined, afterContent: [] as string[][] }
+      result = {
+        content: undefined,
+        afterContent: [] as string[][],
+        beforeContent: [] as string[][],
+      }
     }
 
-    let { content, afterContent } = result;
+    let { content, afterContent, beforeContent } = result;
 
     if (!content) {
       if (!supressNotices) {
@@ -58,10 +63,12 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
 
     content = sanitize(content);
     const processedAfterContent = afterContent.map(row => row.join('')).join('  \n');
+    const processedBeforeContent = beforeContent.map(row => row.join('')).join('  \n');
 
     setValues(content);
     setColJustify(Array(content[0].length).fill('LEFT'));
     setAfterValue(processedAfterContent);
+    setBeforeValue(processedBeforeContent);
     computeAutoFocusRow(content);
   }, [inputData]);
 
@@ -92,7 +99,7 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
 
   const getOutput = () => {
     const tableContent = toMarkdown(values, colJustify);
-    return `${tableContent}  \n${afterValue}`;
+    return `${beforeValue}  \n${tableContent}  \n${afterValue}`;
   }
 
   const copyClicked = () => {
