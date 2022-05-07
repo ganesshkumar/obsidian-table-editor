@@ -7,11 +7,11 @@ const HORIZONTAL_EDITOR_TEXT = 'Open Editor (Below the Active View)';
 const POPOVER_EDITOR_TEXT = "Open Editor (with the hover editor pluging)";
 
 export default class MarkdownTableEditorPlugin extends Plugin {
-	async onload() {
+  async onload() {
     // Add custom icons
     addIcons();
 
-		this.registerView(
+    this.registerView(
       MARKDOWN_TABLE_EDITOR_VIEW,
       (leaf) => new TableView(leaf)
     );
@@ -36,11 +36,11 @@ export default class MarkdownTableEditorPlugin extends Plugin {
 
       menu.addItem((item) =>
         item
-        .setTitle(HORIZONTAL_EDITOR_TEXT)
-        .setIcon('horizontal-split')
-        .onClick(() => {
-          this.activateView('horizontal');
-        })
+          .setTitle(HORIZONTAL_EDITOR_TEXT)
+          .setIcon('horizontal-split')
+          .onClick(() => {
+            this.activateView('horizontal');
+          })
       );
 
       menu.showAtMouseEvent(event);
@@ -48,21 +48,21 @@ export default class MarkdownTableEditorPlugin extends Plugin {
 
     this.addCommand({
       id: 'markdown-table-editor-open-vertical',
-			name: VERTICAL_EDITOR_TEXT,
-			editorCallback: async (_: Editor, __: MarkdownView) => {
-				this.activateView('vertical');
-			}
+      name: VERTICAL_EDITOR_TEXT,
+      editorCallback: async (_: Editor, __: MarkdownView) => {
+        this.activateView('vertical');
+      }
     });
 
     this.addCommand({
       id: 'markdown-table-editor-open-horizontal',
-			name: HORIZONTAL_EDITOR_TEXT,
-			editorCallback: async (_: Editor, __: MarkdownView) => {
-				this.activateView('horizontal');
-			}
+      name: HORIZONTAL_EDITOR_TEXT,
+      editorCallback: async (_: Editor, __: MarkdownView) => {
+        this.activateView('horizontal');
+      }
     });
 
-    
+
     this.addCommand({
       id: 'markdown-table-editor-select-table-content',
       name: 'Select surrounding Table Content',
@@ -82,17 +82,17 @@ export default class MarkdownTableEditorPlugin extends Plugin {
     }
   }
 
-	onunload() {
-		this.app.workspace.detachLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW);
-	}
+  onunload() {
+    this.app.workspace.detachLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW);
+  }
 
-	async activateView(direction: 'vertical' | 'horizontal'| 'popover' = 'vertical') {
+  async activateView(direction: 'vertical' | 'horizontal' | 'popover' = 'vertical') {
     this.app.workspace.detachLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW);
 
-		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-		if(!view) {
-			return;
-		}
+    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (!view) {
+      return;
+    }
 
     let data = this.getData(view)?.data;
     let { line } = view.editor.getCursor();
@@ -111,14 +111,14 @@ export default class MarkdownTableEditorPlugin extends Plugin {
       type: MARKDOWN_TABLE_EDITOR_VIEW,
       active: true,
       state: { data, leafId: _leafid, cursor: _cursor }
-    }); 
+    });
 
     this.app.workspace.revealLeaf(
       this.app.workspace.getLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW)[0]
     );
   }
 
-  getData (view: MarkdownView) {
+  getData(view: MarkdownView) {
     let data = undefined;
     let startCursor = undefined;
     let endCursor = undefined;
@@ -138,7 +138,7 @@ export default class MarkdownTableEditorPlugin extends Plugin {
         } else {
           lineAbove = line;
         }
-        
+
         let lineBelow = Math.min(line + 1, view.editor.lineCount() - 1);
         if (!!view.editor.getLine(lineBelow).trim()) {
           while (lineBelow + 1 < view.editor.lineCount() && !!view.editor.getLine(lineBelow + 1).trim()) {
@@ -157,11 +157,11 @@ export default class MarkdownTableEditorPlugin extends Plugin {
       }
     }
 
-    return {data, startCursor, endCursor};
+    return { data, startCursor, endCursor };
   }
 
-  selectTableContent (view: MarkdownView) {
-    const {data, startCursor, endCursor} =  this.getData(view);
+  selectTableContent(view: MarkdownView) {
+    const { data, startCursor, endCursor } = this.getData(view);
     const parsedData = parseInputData(data);
     if (parseInputData) {
       view.editor.setSelection(startCursor, endCursor);

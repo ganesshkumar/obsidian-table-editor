@@ -80,7 +80,7 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
     if (copyText !== 'Copy as Markdown') {
       setCopyText('Copy as Markdown');
     }
-    updateViewData(toMarkdown(values, colJustify));
+    updateViewData(getOutput());
   }, [values, colJustify]);
 
   const newTableClicked = () => {
