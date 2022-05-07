@@ -103,7 +103,7 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
 
   const getOutput = () => {
     const tableContent = toMarkdown(values, colJustify, isInsideCallout);
-    return `${beforeValue}  \n${tableContent}  \n${afterValue}`;
+    return `${beforeValue && `${beforeValue}  \n`}${tableContent}  ${afterValue && `   \n${afterValue}`}`;
   }
 
   const copyClicked = () => {

@@ -121,7 +121,7 @@ export function parseInputData(input: string): { content: string[][], afterConte
       content: data,
       afterContent,
       beforeContent,
-      isInsideCallout: leftContent.map(v => v.trim()).every(v => v === '>'),
+      isInsideCallout: leftContent.length > 0 && leftContent.map(v => v.trim()).every(v => v.startsWith('>')),
     };
   }
 

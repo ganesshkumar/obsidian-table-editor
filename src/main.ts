@@ -43,6 +43,17 @@ export default class MarkdownTableEditorPlugin extends Plugin {
           })
       );
 
+      if ((this.app as any).plugins.plugins['obsidian-hover-editor'] !== undefined) {
+        menu.addItem((item) =>
+          item
+            .setTitle(POPOVER_EDITOR_TEXT)
+            .setIcon('popup-open')
+            .onClick(() => {
+              this.activateView('popover');
+            })
+        );
+      }
+
       menu.showAtMouseEvent(event);
     });
 
