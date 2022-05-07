@@ -3,10 +3,10 @@ import { MarkdownView, Plugin } from 'obsidian';
 
 import { MARKDOWN_TABLE_EDITOR_VIEW, TableView } from 'view';
 
-export const registerViews = (plugin: Plugin) => {
+export const registerViews = (plugin: MarkdownTableEditorPlugin) => {
   plugin.registerView(
     MARKDOWN_TABLE_EDITOR_VIEW,
-    (leaf) => new TableView(leaf)
+    (leaf) => new TableView(plugin, leaf)
   );
 }
 

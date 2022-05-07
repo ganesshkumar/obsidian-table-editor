@@ -1,4 +1,4 @@
-import { useApp } from "context/hooks";
+import { useApp, usePlugin } from "context/hooks";
 import { Notice, MarkdownView } from "obsidian";
 import * as React from "react";
 import { parseInputData, sanitize, toMarkdown } from "../utils/markdown";
@@ -17,6 +17,7 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
   let _cursor = cursor;
 
   const app = useApp();
+  const plugin = usePlugin();
 
   const [newRows, setNewRows] = React.useState(3);
   const [newCols, setNewCols] = React.useState(3);
@@ -27,6 +28,11 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
   const [colJustify, setColJustify] = React.useState([])
   const [copyText, setCopyText] = React.useState('Copy as Markdown');
   const [autoFocusCell, setAutoFocusCell] = React.useState({ row: -1, col: -1 });
+
+  React.useEffect(() => {
+    setNewRows(plugin.settings.defaultRows);
+    setNewCols(plugin.settings.defaultColumns);
+  }, []);
 
   const onContentChanged = (rowIndex: number, colIndex: number, value: string) => {
     const newValues = [...values];
@@ -146,8 +152,8 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
   return (
     <>
       <div className='mte button-container'>
-        Rows : <input type='text' onChange={e => setNewRows(parseInt(e.target.value))} placeholder='3' />
-        Columns : <input type='text' onChange={e => setNewCols(parseInt(e.target.value))} placeholder='3' />
+        Rows : <input type='text' onChange={e => setNewRows(parseInt(e.target.value))} value={newRows} />
+        Columns : <input type='text' onChange={e => setNewCols(parseInt(e.target.value))} value={newCols} />
         <button onClick={newTableClicked}>New Table</button>
         <button onClick={clearClicked}>Clear Table</button>
       </div>

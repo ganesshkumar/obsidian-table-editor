@@ -1,4 +1,4 @@
-import { Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { MARKDOWN_TABLE_EDITOR_VIEW } from "./view";
 import { addIcons } from 'utils/obsidian/icons';
 import { registerRibbonIcons } from './utils/obsidian/ribbon';
@@ -7,10 +7,14 @@ import { registerViews } from 'utils/obsidian/view';
 
 interface MarkdownEditorSettings {
   defaultDirection: 'vertical' | 'horizontal' | 'popover';
+  defaultRows: number;
+  defaultColumns: number;
 }
 
 const DEFAULT_SETTINGS: MarkdownEditorSettings = {
-  defaultDirection: 'vertical'
+  defaultDirection: 'vertical',
+  defaultRows: 3,
+  defaultColumns: 3
 }
 
 export default class MarkdownTableEditorPlugin extends Plugin {
@@ -77,5 +81,35 @@ class MarkdownEditorSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
       });
+
+    new Setting(containerEl)
+      .setName('Number of rows')
+      .setDesc('Default number of rows in new tables created')
+      .addText(text => text
+        .setPlaceholder('3')
+        .setValue(this.plugin.settings.defaultRows.toString())
+        .onChange(async (value) => {
+          const rows = parseInt(value)
+          if (!rows) {
+            new Notice('Rows has to be positive number. Defaulting to 3');
+          }
+          this.plugin.settings.defaultRows = rows || 3;
+          await this.plugin.saveSettings();
+        }));
+
+    new Setting(containerEl)
+      .setName('Number of columns')
+      .setDesc('Default number of columns in new tables created')
+      .addText(text => text
+        .setPlaceholder('3')
+        .setValue(this.plugin.settings.defaultColumns.toString())
+        .onChange(async (value) => {
+          const cols = parseInt(value)
+          if (!cols) {
+            new Notice('Columns has to be positive number. Defaulting to 3');
+          }
+          this.plugin.settings.defaultColumns = cols || 3;
+          await this.plugin.saveSettings();
+        }));
   }
 }
