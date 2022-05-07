@@ -302,6 +302,37 @@ const Cell = ({ row, col, content, onContentChanged, values, setValues, colJusti
         })
     );
 
+    menu.addSeparator();
+
+    menu.addItem((item) =>
+      item
+        .setTitle("Cut")
+        .setIcon("scissors")
+        .onClick(() => {
+          navigator?.clipboard?.writeText(content);
+          onContentChanged(row, col, '');
+        })
+    );
+
+    menu.addItem((item) =>
+      item
+        .setTitle("Copy")
+        .setIcon("copy")
+        .onClick(() => {
+          navigator?.clipboard?.writeText(content);
+        })
+    );
+
+    menu.addItem((item) =>
+      item
+        .setTitle("Paste")
+        .setIcon("paste")
+        .onClick(() => {
+          navigator.clipboard.readText()
+            .then(content => onContentChanged(row, col, content));
+        })
+    );
+
     if (event?.constructor.name === 'SyntheticBaseEvent') {
       menu.showAtMouseEvent(event);
     } else {
