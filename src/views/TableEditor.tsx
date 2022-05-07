@@ -66,7 +66,7 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
       if (!supressNotices) {
         new Notice("Selection is not a valid Markdown table or CSV or Excel data. Creating a new table!");
       }
-      content = [[''], ['']];
+      content = getNewTable();
     }
 
     content = sanitize(content);
@@ -96,7 +96,7 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
   }
 
   const clearClicked = () => {
-    setValues([[''], ['']]);
+    setValues(getNewTable());
     setColJustify(Array(1).fill('LEFT'));
   }
 
@@ -147,6 +147,12 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
     const endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
 
     view.editor.replaceRange(getOutput(), startCursor, endCursor);
+  }
+
+  const getNewTable = (): string[][] => {
+    let table = Array(newRows).fill([]);
+    table = table.map(row => Array(newCols).fill(''));
+    return table;
   }
 
   return (
