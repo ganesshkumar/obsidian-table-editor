@@ -2,15 +2,18 @@ import { ItemView, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { TableEditor } from "./views/TableEditor";
-import { AppContext } from "./context/context";
+import { AppContext, PluginContext } from "./context/context";
+import MarkdownTableEditorPlugin from "main";
 
 export const MARKDOWN_TABLE_EDITOR_VIEW = "markdown-table-editor-view";
 
 export class TableView extends ItemView {
   private state: any;
+  private plugin: MarkdownTableEditorPlugin;
 
-  constructor(leaf: WorkspaceLeaf) {
+  constructor(plugin: MarkdownTableEditorPlugin, leaf: WorkspaceLeaf) {
     super(leaf);
+    this.plugin = plugin;
   }
 
   getViewType() {
@@ -26,7 +29,9 @@ export class TableView extends ItemView {
       this.state = state;
       ReactDOM.render(
         <AppContext.Provider value={this.app}>
-          <TableEditor leafId={state.leafId} cursor={state.cursor} inputData={state.data} updateViewData={(data: string) => this.state.data = data} supressNotices={false} />
+          <PluginContext.Provider value={this.plugin}>
+            <TableEditor leafId={state.leafId} cursor={state.cursor} inputData={state.data} updateViewData={(data: string) => this.state.data = data} supressNotices={false} />
+          </PluginContext.Provider>
         </AppContext.Provider>,
         this.containerEl.children[1]
       );
@@ -41,7 +46,9 @@ export class TableView extends ItemView {
   async onOpen() {
     ReactDOM.render(
       <AppContext.Provider value={this.app}>
-        <TableEditor leafId='' cursor='' inputData='' updateViewData={(data: string) => this.state.data = data} supressNotices={true} />
+        <PluginContext.Provider value={this.plugin}>
+          <TableEditor leafId='' cursor='' inputData='' updateViewData={(data: string) => this.state.data = data} supressNotices={true} />
+        </PluginContext.Provider>
       </AppContext.Provider>,
       this.containerEl.children[1]
     );

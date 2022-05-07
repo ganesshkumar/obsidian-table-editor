@@ -1,181 +1,115 @@
-import { Editor, MarkdownView, Menu, Plugin } from 'obsidian';
-import { TableView, MARKDOWN_TABLE_EDITOR_VIEW } from "./view";
-import { addIcons } from 'utils/icons';
-import { parseInputData } from './utils/markdown';
-const VERTICAL_EDITOR_TEXT = 'Open Editor (Next to the Active View)';
-const HORIZONTAL_EDITOR_TEXT = 'Open Editor (Below the Active View)';
-const POPOVER_EDITOR_TEXT = "Open Editor (with the hover editor pluging)";
+import { Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { MARKDOWN_TABLE_EDITOR_VIEW } from "./view";
+import { addIcons } from 'utils/obsidian/icons';
+import { registerRibbonIcons } from './utils/obsidian/ribbon';
+import { registerCommands } from 'utils/obsidian/commands';
+import { registerViews } from 'utils/obsidian/view';
+
+interface MarkdownEditorSettings {
+  defaultDirection: 'vertical' | 'horizontal' | 'popover';
+  defaultRows: number;
+  defaultColumns: number;
+}
+
+const DEFAULT_SETTINGS: MarkdownEditorSettings = {
+  defaultDirection: 'vertical',
+  defaultRows: 3,
+  defaultColumns: 3
+}
 
 export default class MarkdownTableEditorPlugin extends Plugin {
+  settings: MarkdownEditorSettings;
+
+  getSettings() {
+    return this.settings;
+  }
+
   async onload() {
-    // Add custom icons
+    await this.loadSettings();
+
     addIcons();
+    registerViews(this);
+    registerRibbonIcons(this);
+    registerCommands(this);
 
-    this.registerView(
-      MARKDOWN_TABLE_EDITOR_VIEW,
-      (leaf) => new TableView(leaf)
-    );
+    this.addSettingTab(new MarkdownEditorSettingTab(this));
+  }
 
-    this.addRibbonIcon("spreadsheet", "Open Markdown Table Editor", (event) => {
-      if (event.type == 'click') {
-        this.activateView('vertical');
-        event.preventDefault();
-        return;
-      }
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
 
-      const menu = new Menu(this.app);
-
-      menu.addItem((item) =>
-        item
-          .setTitle(VERTICAL_EDITOR_TEXT)
-          .setIcon('vertical-split')
-          .onClick(() => {
-            this.activateView('vertical');
-          })
-      );
-
-      menu.addItem((item) =>
-        item
-          .setTitle(HORIZONTAL_EDITOR_TEXT)
-          .setIcon('horizontal-split')
-          .onClick(() => {
-            this.activateView('horizontal');
-          })
-      );
-
-      if ((this.app as any).plugins.plugins['obsidian-hover-editor'] !== undefined) {
-        menu.addItem((item) =>
-          item
-            .setTitle(POPOVER_EDITOR_TEXT)
-            .setIcon('popup-open')
-            .onClick(() => {
-              this.activateView('popover');
-            })
-        );
-      }
-
-      menu.showAtMouseEvent(event);
-    });
-
-    this.addCommand({
-      id: 'markdown-table-editor-open-vertical',
-      name: VERTICAL_EDITOR_TEXT,
-      editorCallback: async (_: Editor, __: MarkdownView) => {
-        this.activateView('vertical');
-      }
-    });
-
-    this.addCommand({
-      id: 'markdown-table-editor-open-horizontal',
-      name: HORIZONTAL_EDITOR_TEXT,
-      editorCallback: async (_: Editor, __: MarkdownView) => {
-        this.activateView('horizontal');
-      }
-    });
-
-
-    this.addCommand({
-      id: 'markdown-table-editor-select-table-content',
-      name: 'Select surrounding Table Content',
-      editorCallback: async (_: Editor, view: MarkdownView) => {
-        this.selectTableContent(view);
-      }
-    });
-
-    if ((this.app as any).plugins.plugins['obsidian-hover-editor'] !== undefined) {
-      this.addCommand({
-        id: "markdown-table-editor-open-in-popover",
-        name: POPOVER_EDITOR_TEXT,
-        editorCallback: async (_: Editor, __: MarkdownView) => {
-          this.activateView("popover");
-        }
-      });
-    }
+  async saveSettings() {
+    await this.saveData(this.settings);
   }
 
   onunload() {
     this.app.workspace.detachLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW);
   }
+}
 
-  async activateView(direction: 'vertical' | 'horizontal' | 'popover' = 'vertical') {
-    this.app.workspace.detachLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW);
+class MarkdownEditorSettingTab extends PluginSettingTab {
+  plugin: MarkdownTableEditorPlugin;
 
-    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-    if (!view) {
-      return;
-    }
-
-    let data = this.getData(view)?.data;
-    let { line } = view.editor.getCursor();
-    let _cursor = line;
-    const activeLeaf = this.app.workspace.activeLeaf;
-    let _leafid = (activeLeaf as any).id;
-
-    let editorLeaf = undefined;
-    if (direction === 'popover') {
-      editorLeaf = (this.app as any).plugins.plugins['obsidian-hover-editor'].spawnPopover();
-    } else {
-      editorLeaf = this.app.workspace.createLeafBySplit(activeLeaf, direction);
-    }
-
-    await editorLeaf.setViewState({
-      type: MARKDOWN_TABLE_EDITOR_VIEW,
-      active: true,
-      state: { data, leafId: _leafid, cursor: _cursor }
-    });
-
-    this.app.workspace.revealLeaf(
-      this.app.workspace.getLeavesOfType(MARKDOWN_TABLE_EDITOR_VIEW)[0]
-    );
+  constructor(plugin: MarkdownTableEditorPlugin) {
+    super(plugin.app, plugin);
+    this.plugin = plugin;
   }
 
-  getData(view: MarkdownView) {
-    let data = undefined;
-    let startCursor = undefined;
-    let endCursor = undefined;
+  display(): void {
+    const { containerEl } = this;
 
-    // If user has selected something. Take the selection
-    if (view.editor.somethingSelected()) {
-      data = view.editor.getSelection();
-    } else {
-      let { line } = view.editor.getCursor();
-      // If user has not selection anything, serach for empty lines above and below the cursor position and take them as data
-      if (!!view.editor.getLine(line).trim()) {
-        let lineAbove = Math.max(line - 1, 0);
-        if (!!view.editor.getLine(lineAbove).trim()) {
-          while (lineAbove > 0 && !!view.editor.getLine(lineAbove - 1).trim()) {
-            lineAbove--;
+    containerEl.empty();
+    containerEl.createEl('h2', { text: 'Settings for Markdown Table Editor' });
+
+    new Setting(containerEl)
+      .setName('Default Direction')
+      .setDesc('Default direction in which the Markdown Editor has to be opened')
+      .addDropdown(dropDown => {
+        dropDown.addOption('vertical', 'Open to the right of active editor');
+        dropDown.addOption('horizontal', 'Open below the active editor');
+        dropDown.addOption('popover', 'Open in popover');
+        dropDown.setValue(this.plugin.settings.defaultDirection);
+        dropDown.onChange(async (value: string) => {
+          let direction: 'vertical' | 'horizontal' | 'popover';
+          if (value !== 'vertical' && value !== 'horizontal' && value !== 'popover') {
+            direction = 'vertical';
+          } else {
+            direction = value;
           }
-        } else {
-          lineAbove = line;
-        }
+          this.plugin.settings.defaultDirection = direction;
+          await this.plugin.saveSettings();
+        });
+      });
 
-        let lineBelow = Math.min(line + 1, view.editor.lineCount() - 1);
-        if (!!view.editor.getLine(lineBelow).trim()) {
-          while (lineBelow + 1 < view.editor.lineCount() && !!view.editor.getLine(lineBelow + 1).trim()) {
-            lineBelow++;
+    new Setting(containerEl)
+      .setName('Number of rows')
+      .setDesc('Default number of rows in new tables created')
+      .addText(text => text
+        .setPlaceholder('3')
+        .setValue(this.plugin.settings.defaultRows.toString())
+        .onChange(async (value) => {
+          const rows = parseInt(value)
+          if (!rows) {
+            new Notice('Rows has to be positive number. Defaulting to 3');
           }
-        } else {
-          lineBelow = line;
-        }
+          this.plugin.settings.defaultRows = rows || 3;
+          await this.plugin.saveSettings();
+        }));
 
-        startCursor = { line: lineAbove, ch: 0 };
-        endCursor = { line: lineBelow, ch: view.editor.getLine(lineBelow).length };
-
-        // Marking the selection to support update from the Table Editor
-        view.editor.setSelection(startCursor, endCursor);
-        data = view.editor.getRange(startCursor, endCursor);
-      }
-    }
-
-    return { data, startCursor, endCursor };
-  }
-
-  selectTableContent(view: MarkdownView) {
-    const { data, startCursor, endCursor } = this.getData(view);
-    const parsedData = parseInputData(data);
-    if (parseInputData) {
-      view.editor.setSelection(startCursor, endCursor);
-    }
+    new Setting(containerEl)
+      .setName('Number of columns')
+      .setDesc('Default number of columns in new tables created')
+      .addText(text => text
+        .setPlaceholder('3')
+        .setValue(this.plugin.settings.defaultColumns.toString())
+        .onChange(async (value) => {
+          const cols = parseInt(value)
+          if (!cols) {
+            new Notice('Columns has to be positive number. Defaulting to 3');
+          }
+          this.plugin.settings.defaultColumns = cols || 3;
+          await this.plugin.saveSettings();
+        }));
   }
 }
