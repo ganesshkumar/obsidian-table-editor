@@ -115,7 +115,6 @@ function mergeWikiLinkCells(input: string[][]): string[][] {
 }
 
 const papaConfig = {
-  delimiter: '|',
   escapeChar: '\\',
 }
 
