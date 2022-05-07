@@ -1,52 +1,5 @@
 import * as Papa from 'papaparse';
 
-/* Not using this function as of now
- * Will be needed if we have to add an exception to parsing logic when [[link|alias]] is used,
- * and where we need to supress spliting at the pipe between the link and alias.
- * keeping it for now, will delete it later in case if this is not needed for a while!
- */
-export function parseMarkdownTable(data: string): any[][] | undefined {
-  if (data) {
-    data = data.trim();
-
-    const lines = data.split('\n');
-    if (lines.length < 2) {
-      return;
-    }
-
-    let headers = lines[0].split('|')
-    headers = headers.splice(1, headers.length - 2);
-
-    if (headers.length <= 1) {
-      // Not a markdown table
-      return
-    }
-
-    let rows = undefined;
-    if (lines.length > 2) {
-      rows = lines.splice(2).map((line: string) => line.split('|'));
-    }
-
-    for (let idx = 0; idx < rows.length; idx++) {
-      rows[idx] = rows[idx].splice(1, rows[idx].length - 2);
-    }
-
-    const result: any[][] = []
-    for (let idx = 0; idx < rows.length + 1; idx++) {
-      const data = idx === 0 ? headers : rows[idx - 1]
-      const rowResult = []
-      for (let colIdx = 0; colIdx < data.length; colIdx++) {
-        rowResult.push(data[colIdx].trim());
-      }
-      result.push(rowResult)
-    }
-
-    return result
-  }
-
-  return undefined;
-}
-
 function sanitizeWikiLinks(input: string): string {
   const matches = (input || '').matchAll(/\[\[\w*\|\w*\]\]/g);
   let match = matches.next();
@@ -68,6 +21,21 @@ function extractAfterContent(input: string[][]): string[][] {
     }
 
     return input.splice(idx);
+  }
+
+  return [] as string[][];
+}
+
+function extractBeforeContent(input: string[][]): string[][] {
+  if (input && input[0]) {
+    let idx = -1;
+    for (idx = 0; idx < input?.length; idx++) {
+      if (input[idx]?.length > 1) {
+        break;
+      }
+    }
+
+    return input.splice(0, idx);
   }
 
   return [] as string[][];
@@ -115,29 +83,35 @@ function mergeWikiLinkCells(input: string[][]): string[][] {
 }
 
 const papaConfig = {
-  delimiter: '|',
   escapeChar: '\\',
 }
 
-export function parseInputData(input: string): { content: string[][], afterContent: string[][] } | undefined {
+export function parseInputData(input: string): { content: string[][], afterContent: string[][], beforeContent: string[][], isInsideCallout: boolean } | undefined {
   input = sanitizeWikiLinks(input);
 
   let { data, meta }: { data: string[][], meta: any } = Papa.parse((input || '').trim(), papaConfig);
   let afterContent: string[][] = undefined;
+  let beforeContent: string[][] = undefined;
+  let leftContent: string[] = [] as string[];
 
-  if (data && data[0]?.length && data[0].length > 1) {
+  if (data && data[0]?.length) {
+    beforeContent = extractBeforeContent(data);
     afterContent = extractAfterContent(data);
 
-    if (meta.delimiter === '|') {
-      // Markdown table
-      removeAlignmentRow(data);
 
+    if (meta.delimiter === '|') {
       // Remove the first and last column that are empty when we parsed the data
       data = data.map((row: string[]) => {
         row.splice(row.length - 1, 1);
-        row.splice(0, 1);
+
+        const dataOnLeft = row.splice(0, 1)
+        leftContent.push(dataOnLeft.join(''));
+
         return row;
       });
+
+      // Markdown table
+      removeAlignmentRow(data);
 
       // Handing [[link|alias]] in a cell
       data = mergeWikiLinkCells(data);
@@ -145,7 +119,9 @@ export function parseInputData(input: string): { content: string[][], afterConte
 
     return {
       content: data,
-      afterContent
+      afterContent,
+      beforeContent,
+      isInsideCallout: leftContent.map(v => v.trim()).every(v => v === '>'),
     };
   }
 
@@ -164,7 +140,7 @@ export function sanitize(data: string[][]) {
   });
 }
 
-export const toMarkdown = (values: any[][], colJustify: string[]): string => {
+export const toMarkdown = (values: any[][], colJustify: string[], isInsideCallout: boolean = false): string => {
   const cols = values[0]?.length;
   let maxColWidth = Array(cols).fill(0);
 
@@ -210,5 +186,10 @@ export const toMarkdown = (values: any[][], colJustify: string[]): string => {
     .map(row => lineformatter(row))
     .join('\n');
 
-  return `${header}\n${alignMarker}\n${rows}`;
+  let markdown = `${header}\n${alignMarker}\n${rows}`;
+  if (isInsideCallout) {
+    markdown = markdown.split('\n').map(row => `> ${row}`).join('\n');
+  }
+
+  return markdown;
 }
