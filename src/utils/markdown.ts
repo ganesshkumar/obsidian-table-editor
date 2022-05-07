@@ -12,10 +12,10 @@ function sanitizeWikiLinks(input: string): string {
 }
 
 function extractAfterContent(input: string[][]): string[][] {
-  if (input && input[0]?.length && input[0].length > 1) {
+  if (input && input[0] && input[0].length > 1) {
     let idx = -1;
-    for (idx = 0; idx < input?.length; idx++) {
-      if (input[idx]?.length == 1) {
+    for (idx = 0; idx < input.length; idx++) {
+      if (input[idx].length == 1) {
         break;
       }
     }
@@ -29,8 +29,8 @@ function extractAfterContent(input: string[][]): string[][] {
 function extractBeforeContent(input: string[][]): string[][] {
   if (input && input[0]) {
     let idx = -1;
-    for (idx = 0; idx < input?.length; idx++) {
-      if (input[idx]?.length > 1) {
+    for (idx = 0; idx < input.length; idx++) {
+      if (input[idx].length > 1) {
         break;
       }
     }
@@ -140,8 +140,12 @@ export function sanitize(data: string[][]) {
   });
 }
 
-export const toMarkdown = (values: any[][], colJustify: string[], isInsideCallout: boolean = false): string => {
+export const toMarkdown = (values: any[][], colJustify: string[], isInsideCallout: boolean): string => {
   const cols = values[0]?.length;
+  if (!cols) {
+    return '';
+  }
+
   let maxColWidth = Array(cols).fill(0);
 
   // Find column width for result
@@ -153,10 +157,10 @@ export const toMarkdown = (values: any[][], colJustify: string[], isInsideCallou
   }
 
   // line formatter function
-  const lineformatter = (row: string[]) => `| ${row.map((h, idx) => {
-    const length = maxColWidth[idx] - (h?.length || 0);
+  const lineformatter = (row: string[]) => `| ${row?.map((value, idx) => {
+    const length = maxColWidth[idx] - (value?.length || 0);
     const suffix = Array(length >= 0 ? length : 1).fill(' ').join('');
-    return Number.isFinite(parseFloat(h)) ? `${suffix}${h}` : `${h}${suffix}`;
+    return Number.isFinite(parseFloat(value)) ? `${suffix}${value}` : `${value}${suffix}`;
   }).join(' | ')} |`;
 
   // Headers

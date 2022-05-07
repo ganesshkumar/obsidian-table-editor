@@ -53,5 +53,5 @@ export class TableView extends ItemView {
 
   registerDomEvent(el: any, type: FocusEvent, callback: any): void {
     console.log('focssed')
-  } 
+  }
 }
