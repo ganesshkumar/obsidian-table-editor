@@ -158,8 +158,8 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
   return (
     <>
       <div className='mte button-container'>
-        Rows : <input type='text' onChange={e => setNewRows(parseInt(e.target.value))} value={newRows} />
-        Columns : <input type='text' onChange={e => setNewCols(parseInt(e.target.value))} value={newCols} />
+        Rows : <input type='text' onChange={e => setNewRows(parseInt(e.target.value) || 0)} value={newRows} />
+        Columns : <input type='text' onChange={e => setNewCols(parseInt(e.target.value) || 0)} value={newCols} />
         <button onClick={newTableClicked}>New Table</button>
         <button onClick={clearClicked}>Clear Table</button>
       </div>
