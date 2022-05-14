@@ -89,8 +89,9 @@ class MarkdownEditorSettingTab extends PluginSettingTab {
         .setPlaceholder('3')
         .setValue(this.plugin.settings.defaultRows.toString())
         .onChange(async (value) => {
-          const rows = parseInt(value)
+          let rows = parseInt(value);
           if (!rows) {
+            rows = 0;
             new Notice('Rows has to be positive number. Defaulting to 3');
           }
           this.plugin.settings.defaultRows = rows || 3;
@@ -104,8 +105,9 @@ class MarkdownEditorSettingTab extends PluginSettingTab {
         .setPlaceholder('3')
         .setValue(this.plugin.settings.defaultColumns.toString())
         .onChange(async (value) => {
-          const cols = parseInt(value)
+          let cols = parseInt(value);
           if (!cols) {
+            cols = 0;
             new Notice('Columns has to be positive number. Defaulting to 3');
           }
           this.plugin.settings.defaultColumns = cols || 3;

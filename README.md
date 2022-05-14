@@ -5,7 +5,7 @@ An Obsidian plugin to provide an editor for Markdown tables. It can open CSV, Mi
 ![Obsidian Table Editor](https://user-images.githubusercontent.com/2135089/155855554-28f69b38-1f1c-4287-b2da-ba0b75ecc1e1.png)
 
 
-[![Tag 0.3.0](https://img.shields.io/badge/tag-0.3.0-blue)](https://github.com/ganesshkumar/obsidian-table-editor) 
+[![Tag 0.3.1](https://img.shields.io/badge/tag-0.3.1-blue)](https://github.com/ganesshkumar/obsidian-table-editor) 
 [![MIT License](https://img.shields.io/github/license/ganesshkumar/obsidian-table-editor)](LICENSE)
 [![codecov](https://codecov.io/gh/ganesshkumar/obsidian-table-editor/branch/master/graph/badge.svg?token=G6IK79F5FR)](https://codecov.io/gh/ganesshkumar/obsidian-table-editor)
 
