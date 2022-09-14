@@ -1,3 +1,4 @@
+import { table } from "console";
 import { useApp, usePlugin } from "context/hooks";
 import { Notice, MarkdownView } from "obsidian";
 import * as React from "react";
@@ -155,6 +156,16 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
     return table;
   }
 
+  const addRow = () => {
+    const newValues = [...values, Array(values[0].length).fill('')];
+    setValues(newValues);
+  }   
+
+  const addCol = () => {
+    const newValues = values.map(row => [...row, '']);    
+    setValues(newValues);
+  }
+
   return (
     <>
       <div className='mte button-container'>
@@ -165,6 +176,10 @@ export const TableEditor = ({ leafId, cursor, inputData, updateViewData, supress
       </div>
       <div className='mte button-container'>
         <button onClick={copyClicked}>{copyText}</button>
+      </div>
+      <div className="mte button-container">
+        <button onClick={addRow}>Add Row</button>
+        <button onClick={addCol}>Add Column</button>
       </div>
       <div className="mte grid" style={{
         gridTemplateColumns: `repeat(${values[0]?.length}, 1fr)`
