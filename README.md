@@ -122,9 +122,9 @@ The following operations are supported
 
 ### 2.1 From GitHub
 
-1. Download the Latest Release from the Releases section of the GitHub Repository
-2. Put files to your vault's plugins folder: `<vault>/.obsidian/plugins/obsidian-excel-to-markdown-table`  
-3. Reload Obsidian
+1. Download `main.js`, `manifest.json` and `styles.css` from the latest Release from the Releases section of the GitHub Repository.
+2. Put the downloaded files in a new folder in your vault's plugins folder: `<vault>/.obsidian/plugins/markdown-table-editor`.  
+3. Reload Obsidian.
 4. If prompted about Safe Mode, you can disable safe mode and enable the plugin.  
     Otherwise, head to Settings, third-party plugins, make sure safe mode is off and enable the plugin from there.
 
